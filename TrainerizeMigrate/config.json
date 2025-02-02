@@ -1,0 +1,10 @@
+{
+  "username": "davie@recallhosting.co.uk",
+  "password": "xxx",
+  "groupname":  "rscoaching1",
+  "ptusername": "blah@recallhosting.co.uk",
+  "ptpassword": "xxx",
+  "ptgroupname":  "blah24",
+  "loginurl": "https://api.trainerize.com/v03/user/login",
+  "bodystatsdataurl": "https://api.trainerize.com/v03/graph/getBodystats"
+}
