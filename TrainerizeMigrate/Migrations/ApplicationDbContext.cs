@@ -21,7 +21,7 @@ namespace TrainerizeMigrate.Migrations
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
-            DbPath = Path.Join(path, "trainerize" + Guid.NewGuid().ToString() + ".db");
+            DbPath = Path.Join(path, "trainerize.db");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlite($"Data Source={DbPath}");

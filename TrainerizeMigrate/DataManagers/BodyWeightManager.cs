@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using TrainerizeMigrate.API;
 using TrainerizeMigrate.Migrations;
 using TrainerizeMigrate.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Nodes;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -25,16 +27,25 @@ namespace TrainerizeMigrate.DataManagers
 
         public bool ExtractAndStoreData()
         {
-            AuthenticationSession authDetails = Authenticate.AuthenticateWithTrainerize(_config);
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithOriginalTrainerize(_config);
             BodyWeightResponse bodyWeightData = PullBodyWeightData(authDetails);
 
             StoreBodyWeightData(bodyWeightData);
 
-            return false;
+            return true;
         }
 
         public bool ImportExtractedData()
         {
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerize(_config);
+            BodyWeight bodyWeightData = ReadBodyWeightData();
+
+            if (bodyWeightData != null)
+            {
+                PushBodyWeightData(authDetails, bodyWeightData);
+                return true;
+            }
+
             return false;
         }
 
@@ -79,7 +90,8 @@ namespace TrainerizeMigrate.DataManagers
                 {
                     date = datapoint.date,
                     id = datapoint.id,
-                    value = datapoint.value
+                    value = datapoint.value,
+                    imported = false
                 });
             }
 
@@ -91,12 +103,126 @@ namespace TrainerizeMigrate.DataManagers
                 unit = bodyWeightData.unit
             });
 
-            //_context.SaveChanges();
-
             _context.Body_Weight_Point.AddRange(weightPoints);
 
             _context.SaveChanges();
             return true;
+        }
+
+        private BodyWeight ReadBodyWeightData()
+        {
+            return _context.Body_Weight.Include(x => x.points.Where(y => !y.imported)).FirstOrDefault();
+        }
+
+        private bool PushBodyWeightData(AuthenticationSession authDetails, BodyWeight bodyWeightData)
+        {
+            foreach(WeightPoint weightPoint in bodyWeightData.points)
+            {
+                int BodyStatId = CreateBodyStat(authDetails, weightPoint.date);
+
+                if (!AddBodyStatsData(authDetails, BodyStatId, weightPoint.value, weightPoint.date))
+                    throw new Exception("Could not add Body Stat Data");
+
+                UpdateBodyWeightPointToUpdated(weightPoint.id);
+            }
+
+            return true;
+        }
+
+        private bool UpdateBodyWeightPointToUpdated(int bodyWeightId)
+        {
+
+        }
+
+        private int CreateBodyStat(AuthenticationSession authDetails, string date)
+        {
+            AddBodyStatRequest jsonBody = new AddBodyStatRequest()
+            {
+                date = date,
+                status = "scheduled",
+                userID = authDetails.userId
+            };
+
+            var authenticator = new JwtAuthenticator(authDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.AddBodyStatsUrl();
+            request.Method = Method.Post;
+            request.AddJsonBody(jsonBody, ContentType.Json);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var queryResult = client.Execute(request);
+
+            AddBodyStatResponse response = JsonSerializer.Deserialize<AddBodyStatResponse>(queryResult.Content);
+
+            return response.bodyStatsID;
+        }
+
+        private bool AddBodyStatsData(AuthenticationSession authDetails, int bodyStatsID, double bodyWeight, string date)
+        {
+            AddBodyStatDataRequest jsonBody = new AddBodyStatDataRequest() { 
+                date = date,
+                id  = bodyStatsID,
+                unitBodystats  = "cm",
+                unitWeight = "kg",
+                userID  = authDetails.userId,
+                bodyMeasures = new BodyMeasures()
+                {
+                    date = date,
+                    bodyWeight = bodyWeight.ToString(),
+                    caliperMode  = 7,
+                    bloodPressureDiastolic = string.Empty,
+                    bloodPressureSystolic = string.Empty,  
+                    bodyFatPercent = string.Empty,
+                    caliperAbdomen = string.Empty,
+                    caliperAxilla = string.Empty,
+                    caliperBF = string.Empty,
+                    caliperChest = string.Empty,
+                    caliperSubscapular = string.Empty,
+                    caliperSuprailiac = string.Empty,
+                    caliperThigh = string.Empty,
+                    caliperTriceps = string.Empty,
+                    chest = string.Empty,
+                    hips = string.Empty,
+                    leftBicep = string.Empty,
+                    leftCalf = string.Empty,
+                    leftForearm = string.Empty,
+                    leftThigh = string.Empty,
+                    neck = string.Empty,
+                    rightBicep = string.Empty,
+                    rightCalf = string.Empty,
+                    rightForearm = string.Empty,
+                    rightThigh = string.Empty,
+                    shoulders = string.Empty,
+                    waist = string.Empty
+                }
+            };
+
+
+            var authenticator = new JwtAuthenticator(authDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.AddBodyStatsDataUrl();
+            request.Method = Method.Post;
+            request.AddJsonBody(jsonBody, ContentType.Json);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var queryResult = client.Execute(request);
+            
+            AddBodyStatDataReponse response = JsonSerializer.Deserialize<AddBodyStatDataReponse>(queryResult.Content);
+
+            if (response.code == 0)
+                return true;
+
+            return false;
         }
 
     }

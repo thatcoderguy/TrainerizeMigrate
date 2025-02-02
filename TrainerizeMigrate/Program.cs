@@ -16,7 +16,20 @@ Console.WriteLine(db.DbPath);
 
 db.Database.Migrate();
 
+Console.WriteLine("Retreiving body weight data");
+
+
 BodyWeightManager bodyWeightManager = new BodyWeightManager(config, db);
 bodyWeightManager.ExtractAndStoreData();
+
+
+Console.WriteLine("Importing body weight data");
+
+
+bodyWeightManager.ImportExtractedData();
+
+
+Console.WriteLine("Done. Press Any Key");
+
 
 Console.ReadKey();

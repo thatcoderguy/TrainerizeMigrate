@@ -1,5 +1,6 @@
 {
   "loginurl": "https://api.trainerize.com/v03/user/login",
   "bodystatsdataurl": "https://api.trainerize.com/v03/graph/getBodystats",
-  "bodystatsadddataurl": "https://api.trainerize.com/v03/graph/getBodystats"
+  "bodystatsaddurl": "https://api.trainerize.com/v03/bodystats/add",
+  "bodystatsdataadddataurl": "https://api.trainerize.com/v03/bodystats/set"
 }

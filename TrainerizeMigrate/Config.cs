@@ -21,7 +21,9 @@ namespace TrainerizeMigrate
     {
         public string loginurl { get; set; }
         public string bodystatsdataurl { get; set; }
-        public string bodystatsadddataurl { get; set; }
+        public string bodystatsaddurl { get; set; }
+        public string bodystatsdataadddataurl { get; set; }
+
     }
 
 
@@ -87,7 +89,12 @@ namespace TrainerizeMigrate
 
         public string AddBodyStatsUrl()
         {
-            return _trainerizeurls.bodystatsadddataurl;
+            return _trainerizeurls.bodystatsaddurl;
+        }
+
+        public string AddBodyStatsDataUrl()
+        {
+            return _trainerizeurls.bodystatsdataadddataurl;
         }
     }
 }

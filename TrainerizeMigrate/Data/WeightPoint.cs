@@ -14,5 +14,6 @@ namespace TrainerizeMigrate.Data
         public int id { get; set; }
         public string date { get; set; }
         public double value { get; set; }
+        public bool imported { get; set; } = false;
     }
 }
