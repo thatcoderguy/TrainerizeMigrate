@@ -53,8 +53,12 @@ namespace TrainerizeMigrate.DataManagers
         {
             string? lastDate = _context.Body_Weight_Point.OrderByDescending(x => x.date).FirstOrDefault()?.date;
 
-            if(lastDate != null) 
-                return lastDate;
+            if(lastDate != null)
+            {
+                DateTime date = DateTime.Parse(lastDate);
+                date = date.AddDays(1);
+                return date.ToString("yyyy-MM-dd");
+            }
 
             return DateTime.Now.AddYears(-10).ToString("yyyy-MM-dd");
         }
@@ -105,13 +109,22 @@ namespace TrainerizeMigrate.DataManagers
                 });
             }
 
+            BodyWeight bodyWeightRecord = _context.Body_Weight.FirstOrDefault();
 
-            _context.Body_Weight.Add(new BodyWeight()
+            if (bodyWeightRecord != null)
             {
-                goal = bodyWeightData.goal,
-                points = weightPoints,
-                unit = bodyWeightData.unit
-            });
+                bodyWeightRecord.points.AddRange(weightPoints);
+                _context.Body_Weight.Update(bodyWeightRecord);
+            }
+            else
+            {
+                _context.Body_Weight.Add(new BodyWeight()
+                {
+                    goal = bodyWeightData.goal,
+                    points = weightPoints,
+                    unit = bodyWeightData.unit
+                });
+            }
 
             _context.Body_Weight_Point.AddRange(weightPoints);
 
