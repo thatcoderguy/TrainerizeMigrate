@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrainerizeMigrate
 {
-    public class AuthenticationDetails
+    public class AuthenticationSession
     {
         public int userId { get; set; }
         public string token { get; set; }

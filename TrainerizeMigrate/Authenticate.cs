@@ -11,13 +11,13 @@ namespace TrainerizeMigrate
 {
     public static class Authenticate
     {
-        public static AuthenticationDetails AuthenticateWithTrainerize(Config config)
+        public static AuthenticationSession AuthenticateWithTrainerize(Config config)
         {
             TrainerizeLoginRequest jsonBody = new TrainerizeLoginRequest()
             {
-                email = config.Username(),
-                password = config.Password(),
-                groupUrl = config.GroupName(),
+                email = config.Orignal_Username(),
+                password = config.Original_Password(),
+                groupUrl = config.Original_GroupName(),
                 rememberMe = true
             };
 
@@ -32,7 +32,7 @@ namespace TrainerizeMigrate
             TrainerizeLoginResponse response = JsonSerializer.Deserialize<TrainerizeLoginResponse>(queryResult.Content);
 
             if (response.code == 1)
-                return new AuthenticationDetails()
+                return new AuthenticationSession()
                 {
                     token = response.token.access_token,
                     userId = response.userid

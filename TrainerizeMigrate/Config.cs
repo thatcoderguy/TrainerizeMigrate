@@ -7,70 +7,87 @@ using System.Threading.Tasks;
 
 namespace TrainerizeMigrate
 {
-    public class ConfigDetails
+    public class AuthenticationDetails
     {
-        public string username { get; set; }
-        public string password { get; set; }
-        public string groupname { get; set; }
-        public string ptusername { get; set; }
-        public string ptpassword { get; set; }
-        public string ptgroupname { get; set; }
+        public string original_username { get; set; }
+        public string original_password { get; set; }
+        public string original_groupname { get; set; }
+        public string new_username { get; set; }
+        public string new_password { get; set; }
+        public string new_groupname { get; set; }
+    }
+
+    public class TrainerizeUrls
+    {
         public string loginurl { get; set; }
         public string bodystatsdataurl { get; set; }
+        public string bodystatsadddataurl { get; set; }
     }
 
 
     public class Config
     {
-        private ConfigDetails _configDetails { get; set; }
+        private AuthenticationDetails _authDetails { get; set; }
+        private TrainerizeUrls _trainerizeurls { get; set; }
 
         public Config() {
             using (StreamReader r = new StreamReader("config.json"))
             {
                 string json = r.ReadToEnd();
-                _configDetails = JsonSerializer.Deserialize<ConfigDetails>(json);
+                _authDetails = JsonSerializer.Deserialize<AuthenticationDetails>(json);
+            }
+
+            using (StreamReader r = new StreamReader("trainerize_urls.json"))
+            {
+                string json = r.ReadToEnd();
+                _trainerizeurls = JsonSerializer.Deserialize<TrainerizeUrls>(json);
             }
 
         }
 
-        public string Username()
+        public string Orignal_Username()
         {
-            return _configDetails.username;
+            return _authDetails.original_username;
         }
 
-        public string Password()
+        public string Original_Password()
         {
-            return _configDetails.password;
+            return _authDetails.original_password;
         }
 
-        public string PTPassword()
+        public string New_Password()
         {
-            return _configDetails.ptpassword;
+            return _authDetails.new_password;
         }
 
-        public string PTUsername()
+        public string New_Username()
         {
-            return _configDetails.ptusername;
+            return _authDetails.new_username;
         }
 
-        public string GroupName()
+        public string Original_GroupName()
         {
-            return _configDetails.groupname;
+            return _authDetails.original_groupname;
         }
 
-        public string PTGroupName()
+        public string New_GroupName()
         {
-            return _configDetails.ptgroupname;
+            return _authDetails.new_groupname;
         }
 
         public string LoginUrl()
         {
-            return _configDetails.loginurl;
+            return _trainerizeurls.loginurl;
         }
 
-        public string BodyStatsUrl()
+        public string GetBodyStatsUrl()
         {
-            return _configDetails.bodystatsdataurl;
+            return _trainerizeurls.bodystatsdataurl;
+        }
+
+        public string AddBodyStatsUrl()
+        {
+            return _trainerizeurls.bodystatsadddataurl;
         }
     }
 }

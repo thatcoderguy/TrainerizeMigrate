@@ -25,7 +25,7 @@ namespace TrainerizeMigrate.DataManagers
 
         public bool ExtractAndStoreData()
         {
-            AuthenticationDetails authDetails = Authenticate.AuthenticateWithTrainerize(_config);
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithTrainerize(_config);
             BodyWeightResponse bodyWeightData = PullBodyWeightData(authDetails);
 
             StoreBodyWeightData(bodyWeightData);
@@ -38,7 +38,7 @@ namespace TrainerizeMigrate.DataManagers
             return false;
         }
 
-        private BodyWeightResponse PullBodyWeightData(AuthenticationDetails authDetails)
+        private BodyWeightResponse PullBodyWeightData(AuthenticationSession authDetails)
         {
             BodyWeightRequest jsonBody = new BodyWeightRequest()
             {
@@ -58,7 +58,7 @@ namespace TrainerizeMigrate.DataManagers
             };
             RestClient client = new RestClient(options);
             var request = new RestRequest();
-            request.Resource = _config.BodyStatsUrl();
+            request.Resource = _config.GetBodyStatsUrl();
             request.Method = Method.Post;
             request.AddJsonBody(jsonBody, ContentType.Json);
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
