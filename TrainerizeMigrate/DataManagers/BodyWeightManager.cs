@@ -49,12 +49,22 @@ namespace TrainerizeMigrate.DataManagers
             return false;
         }
 
+        private string GetLastRetreivedBodyWeightEntry()
+        {
+            string? lastDate = _context.Body_Weight_Point.OrderByDescending(x => x.date).FirstOrDefault()?.date;
+
+            if(lastDate != null) 
+                return lastDate;
+
+            return DateTime.Now.AddYears(-10).ToString("yyyy-MM-dd");
+        }
+
         private BodyWeightResponse PullBodyWeightData(AuthenticationSession authDetails)
         {
             BodyWeightRequest jsonBody = new BodyWeightRequest()
             {
                 //"2025-02-28"
-                startDate = DateTime.Now.AddYears(-10).ToString("yyyy-MM-dd"),
+                startDate = GetLastRetreivedBodyWeightEntry(),
                 endDate = DateTime.Now.ToString("yyyy-MM-dd"),
                 type = "bodyweight",
                 unit = "kg",
@@ -131,7 +141,13 @@ namespace TrainerizeMigrate.DataManagers
 
         private bool UpdateBodyWeightPointToUpdated(int bodyWeightId)
         {
+            WeightPoint point = _context.Body_Weight_Point.FirstOrDefault(x => x.id == bodyWeightId);
+            point.imported = true;
 
+            _context.Body_Weight_Point.Update(point);
+            _context.SaveChanges();
+
+            return true;
         }
 
         private int CreateBodyStat(AuthenticationSession authDetails, string date)
