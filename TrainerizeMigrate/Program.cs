@@ -6,10 +6,17 @@ using Microsoft.EntityFrameworkCore;
 using TrainerizeMigrate;
 using TrainerizeMigrate.DataManagers;
 
-Console.WriteLine("Hello, World!");
+
 
 ApplicationDbContext db = new ApplicationDbContext();
 Config config = new Config();
 
-BodyWeightManager bodyWeightManager = new BodyWeightManager(config);
-bodyWeightManager.ExtractData();
+Console.WriteLine(db.DbPath);
+
+
+db.Database.Migrate();
+
+BodyWeightManager bodyWeightManager = new BodyWeightManager(config, db);
+bodyWeightManager.ExtractAndStoreData();
+
+Console.ReadKey();

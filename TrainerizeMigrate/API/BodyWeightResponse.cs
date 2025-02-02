@@ -16,7 +16,7 @@ namespace TrainerizeMigrate.API
     public class BodyWeightResponse
     {
         public string unit { get; set; }
-        public object goal { get; set; }
+        public string? goal { get; set; }
         public List<Point> points { get; set; }
     }
 }

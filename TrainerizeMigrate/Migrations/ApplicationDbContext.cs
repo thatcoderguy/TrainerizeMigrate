@@ -13,7 +13,7 @@ namespace TrainerizeMigrate.Migrations
         //public virtual DbSet<TrainerizeLoginModel> TrainerizeLogin { get; set; }
 
         public virtual DbSet<BodyWeight> Body_Weight { get; set; }
-        public virtual DbSet<WeightPoints> Body_Weight_Point { get; set; }
+        public virtual DbSet<WeightPoint> Body_Weight_Point { get; set; }
 
         public string DbPath { get; }
 

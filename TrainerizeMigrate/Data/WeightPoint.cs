@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TrainerizeMigrate.Data
 {
-    public class WeightPoints
+    public class WeightPoint
     {
         [Key]
         public int id { get; set; }
