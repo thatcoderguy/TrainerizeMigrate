@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /TrainerizeMigrate/config.json
+/TrainerizeMigrate/config.json
