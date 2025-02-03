@@ -23,6 +23,7 @@ namespace TrainerizeMigrate
         public string getbodystatsdataurl { get; set; }
         public string addbodystatsurl { get; set; }
         public string addbodystatsdataurl { get; set; }
+        public string performedexcersizesurl { get; set; }
 
     }
 
@@ -94,6 +95,11 @@ namespace TrainerizeMigrate
         public string AddBodyStatDataUrl()
         {
             return _trainerizeurls.addbodystatsdataurl;
+        }
+
+        public string GetPerformedExcersizesUrl()
+        {
+            return _trainerizeurls.performedexcersizesurl;
         }
     }
 }

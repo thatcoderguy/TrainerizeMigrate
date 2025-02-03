@@ -34,20 +34,22 @@ internal class Program
         else
             Environment.Exit(1);
 
-        //build a menu
         bool itemselected = false;
         BodyWeightManager bodyWeightManager = new BodyWeightManager(config, db);
+        ExcersizeManager excersizeManager = new ExcersizeManager(config, db);
+        WorkoutManager workoutManager = new WorkoutManager(config, db);
+        TrainingSessionManager trainingSessionManager = new TrainingSessionManager(config, db);
 
         do
         {
-            var userSelectionResult = await HandleUserSelection(bodyWeightManager);
+            var userSelectionResult = await HandleUserSelection(bodyWeightManager, excersizeManager, workoutManager, trainingSessionManager);
             itemselected = userSelectionResult.IsExit;
 
         } while (!itemselected);
 
     }
 
-    public static async Task<(bool IsExit, bool something)> HandleUserSelection(BodyWeightManager bodyWeightManager)
+    public static async Task<(bool IsExit, bool something)> HandleUserSelection(BodyWeightManager bodyWeightManager, ExcersizeManager excersizeManager, WorkoutManager workoutManager, TrainingSessionManager trainingSessionManager)
     {
         bool action = false;
         while (!action)
@@ -68,11 +70,12 @@ internal class Program
 
                 case "[red]Import Body Weight Data[/]":
                    bodyWeightManager.ImportExtractedData();
-
                     break;
 
                 case "[red]Extract Custom Excersizes[/]":
+                    excersizeManager.ExtractAndStoreData();
                     break;
+
                 case "[red]Import Custom Excersizes[/]":
                     break;
                 case "[red]Import Phases and Workouts[/]":
