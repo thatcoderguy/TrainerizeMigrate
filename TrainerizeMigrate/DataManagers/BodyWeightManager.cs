@@ -105,7 +105,7 @@ namespace TrainerizeMigrate.DataManagers
                     date = datapoint.date,
                     id = datapoint.id,
                     value = datapoint.value,
-                    imported = false
+                    newbodystatid = null
                 });
             }
 
@@ -134,7 +134,7 @@ namespace TrainerizeMigrate.DataManagers
 
         private BodyWeight ReadBodyWeightData()
         {
-            return _context.Body_Weight.Include(x => x.points.Where(y => !y.imported)).FirstOrDefault();
+            return _context.Body_Weight.Include(x => x.points.Where(y => y.newbodystatid == null)).FirstOrDefault();
         }
 
         private bool PushBodyWeightData(AuthenticationSession authDetails, BodyWeight bodyWeightData)
@@ -146,16 +146,16 @@ namespace TrainerizeMigrate.DataManagers
                 if (!AddBodyStatsData(authDetails, BodyStatId, weightPoint.value, weightPoint.date))
                     throw new Exception("Could not add Body Stat Data");
 
-                UpdateBodyWeightPointToUpdated(weightPoint.id);
+                UpdateBodyWeightPointToUpdated(weightPoint.id, BodyStatId);
             }
 
             return true;
         }
 
-        private bool UpdateBodyWeightPointToUpdated(int bodyWeightId)
+        private bool UpdateBodyWeightPointToUpdated(int bodyWeightId, int newBodyStatsId)
         {
             WeightPoint point = _context.Body_Weight_Point.FirstOrDefault(x => x.id == bodyWeightId);
-            point.imported = true;
+            point.newbodystatid = newBodyStatsId;
 
             _context.Body_Weight_Point.Update(point);
             _context.SaveChanges();
