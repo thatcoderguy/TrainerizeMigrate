@@ -13,6 +13,8 @@ using System.Text.Json;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Net;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -151,7 +153,7 @@ namespace TrainerizeMigrate.DataManagers
 
         private List<CustomExcersize> ReadCustomExcersizesNotImported()
         {
-            List<Data.CustomExcersize> excersizeList = _context.Excerisize.Include(x => x.tags).Where(x => x.new_id == null).ToList();
+            List<CustomExcersize> excersizeList = _context.Excerisize.Include(x => x.tags).Where(x => x.new_id == null).ToList();
             return excersizeList;
         }
 
@@ -205,7 +207,14 @@ namespace TrainerizeMigrate.DataManagers
         private int AddCustomExcersize(AuthenticationSession authDetails, CustomExcersize excersize)
         {
 
-            AddCustomExcersizeRequest jsonBody = new AddCustomExcersizeRequest()
+            if (excersize.videoType == "youtube")
+                if (!CheckYouTubeVideoExists(excersize.videoUrl)) ;
+                { 
+                    excersize.videoType = "none";
+                    excersize.videoUrl = string.Empty;
+                }
+
+    AddCustomExcersizeRequest jsonBody = new AddCustomExcersizeRequest()
             {
                 alternateName = excersize.alternateName,
                 description = excersize.description,
@@ -217,7 +226,6 @@ namespace TrainerizeMigrate.DataManagers
                 type = "custom",
                 videoType = excersize.videoType,
                 videoUrl = excersize.videoUrl,
-                videoURL = excersize.videoUrl,
                 media = new ExcersizeMedia()
                 {
                     status = null,
@@ -239,12 +247,24 @@ namespace TrainerizeMigrate.DataManagers
             request.Method = Method.Post;
             request.AddJsonBody(jsonBody, ContentType.Json);
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-            var queryResult = client.Execute(request);
+            RestResponse queryResult =  queryResult = client.Execute(request);
 
             AddCustomExcersizeResponse response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
 
             return response.id;
+        }
 
+        private bool CheckYouTubeVideoExists(string videoToken)
+        {
+            HttpClient _client = new HttpClient();
+            HttpResponseMessage response = _client.GetAsync("https://www.youtube.com/embed/" + videoToken + "?autoplay=0&rel=0&modestbranding=1&wmode=transparent&showInfo=0").Result;
+
+            string contentText =  response.Content.ReadAsStringAsync().Result;
+
+            if(contentText.Contains("This video is unavailable"))
+                return false;
+
+            return true;
         }
 
         static ProgressColumn[] GetProgressColumns()

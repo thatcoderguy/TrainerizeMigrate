@@ -33,7 +33,7 @@ namespace TrainerizeMigrate.API
         public ExcersizeMedia media { get; set; }
         public string videoType { get; set; }
         public string videoUrl { get; set; }
-        public string videoURL { get; set; }
+        //public string videoURL { get; set; }
     }
 
 
