@@ -155,15 +155,30 @@ namespace TrainerizeMigrate.DataManagers
 
         private bool PushBodyWeightData(AuthenticationSession authDetails, BodyWeight bodyWeightData)
         {
-            foreach(WeightPoint weightPoint in bodyWeightData.points)
-            {
-                int BodyStatId = CreateBodyStat(authDetails, weightPoint.date);
 
-                if (!AddBodyStatsData(authDetails, BodyStatId, weightPoint.value, weightPoint.date))
-                    throw new Exception("Could not add Body Stat Data");
+            AnsiConsole.Progress()
+                .Columns(GetProgressColumns())
+                .Start(async ctx =>
+                {
+                    var task = ctx.AddTask($"[green]Importing body weight data...[/]", autoStart: false);
+                    task.MaxValue = bodyWeightData.points.Count;
+                    task.StartTask();
 
-                UpdateBodyWeightPointToUpdated(weightPoint.id, BodyStatId);
-            }
+                    foreach (WeightPoint weightPoint in bodyWeightData.points)
+                    {
+                        int BodyStatId = CreateBodyStat(authDetails, weightPoint.date);
+
+                        if (AddBodyStatsData(authDetails, BodyStatId, weightPoint.value, weightPoint.date))
+                            UpdateBodyWeightPointToUpdated(weightPoint.id, BodyStatId);
+                        else
+                            AnsiConsole.Markup("[red]Body stat already exists for date: " + weightPoint.date + "\n[/]");
+
+
+                        task.Increment(1);
+                    }
+                    task.StopTask();
+                });
+
 
             return true;
         }
@@ -268,6 +283,19 @@ namespace TrainerizeMigrate.DataManagers
                 return true;
 
             return false;
+        }
+
+
+        static ProgressColumn[] GetProgressColumns()
+        {
+            List<ProgressColumn> progressColumns;
+
+            progressColumns = new List<ProgressColumn>()
+            {
+                new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()
+            };
+
+            return progressColumns.ToArray();
         }
 
     }

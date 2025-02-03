@@ -63,13 +63,11 @@ internal class Program
             switch (mainMenuSelection)
             {
                 case "[red]Extract Body Weight Data[/]":
-                    AnsiConsole.Markup("[green]Retreiving body weight data\n[/]");
                     bodyWeightManager.ExtractAndStoreData();
                     break;
 
                 case "[red]Import Body Weight Data[/]":
-                    Console.WriteLine("Importing body weight data");
-                    //bodyWeightManager.ImportExtractedData();
+                   bodyWeightManager.ImportExtractedData();
 
                     break;
 
