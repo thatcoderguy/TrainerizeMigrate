@@ -208,13 +208,13 @@ namespace TrainerizeMigrate.DataManagers
         {
 
             if (excersize.videoType == "youtube")
-                if (!CheckYouTubeVideoExists(excersize.videoUrl)) ;
+                if (!CheckYouTubeVideoExists(excersize.videoUrl))
                 { 
                     excersize.videoType = "none";
                     excersize.videoUrl = string.Empty;
                 }
 
-    AddCustomExcersizeRequest jsonBody = new AddCustomExcersizeRequest()
+            AddCustomExcersizeRequest jsonBody = new AddCustomExcersizeRequest()
             {
                 alternateName = excersize.alternateName,
                 description = excersize.description,
