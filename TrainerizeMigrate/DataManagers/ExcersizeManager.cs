@@ -10,6 +10,8 @@ using TrainerizeMigrate.API;
 using TrainerizeMigrate.Data;
 using TrainerizeMigrate.Migrations;
 using System.Text.Json;
+using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -34,8 +36,10 @@ namespace TrainerizeMigrate.DataManagers
             ExcersizeListResponse exercizeList = PullExcersizeData(authDetails);
             AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
 
+            ExcersizeListResponse customExcersizes = FilterCustomExcersizes(exercizeList);
+
             AnsiConsole.Markup("[green]Storing custom excersizes into database\n[/]");
-            //StoreCustomExcersizes(exercizeList);
+            StoreCustomExcersizes(customExcersizes);
             AnsiConsole.Markup("[green]Data storage successful\n[/]");
 
             return true;
@@ -89,6 +93,60 @@ namespace TrainerizeMigrate.DataManagers
             ExcersizeListResponse response = JsonSerializer.Deserialize<ExcersizeListResponse>(queryResult.Content);
 
             return response;
+        }
+
+        private ExcersizeListResponse FilterCustomExcersizes(ExcersizeListResponse excersizeList)
+        {
+            excersizeList.exercises = excersizeList.exercises.Where(x => x.type == "custom").ToList();
+            return excersizeList;
+        }
+
+        private bool StoreCustomExcersizes(ExcersizeListResponse excersizeList)
+        {
+            foreach (Exercise excersize in excersizeList.exercises)
+            {
+                if (!_context.Excerisize.Any(x => x.id == excersize.id))
+                {
+                    Data.Excersize newExcersize = new Data.Excersize()
+                    {
+                        name = excersize.name,
+                        id = excersize.id,
+                        alternateName = excersize.alternateName,
+                        description = excersize.description,
+                        recordType = excersize.recordType,
+                        videoType = excersize.videoType,
+                        videoUrl = excersize.videoUrl,
+                        new_id = null,
+                        tags = null
+                    };
+
+                    List<Data.Tag> newTags = new List<Data.Tag>();
+                    
+                    foreach(API.Tag tag in excersize.tags)
+                    {
+                        newTags.Add(new Data.Tag()
+                        {
+                            name = tag.name,
+                            type = tag.type,
+                            Id = new Guid()
+                        });
+                    }
+
+                    newExcersize.tags = newTags;
+
+                    _context.Tag.AddRange(newTags);
+                    _context.Excerisize.Add(newExcersize);
+
+                    _context.SaveChanges();
+
+                    AnsiConsole.Markup("[green]Added excersize: " + excersize.name + "\n[/]");
+
+                } else
+                    AnsiConsole.Markup("[red]Excersize: " + excersize.name +  " already exists!\n[/]");
+
+            }
+
+            return false;
         }
     }
 }

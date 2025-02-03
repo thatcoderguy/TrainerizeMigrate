@@ -3,5 +3,6 @@
   "getbodystatsdataurl": "https://api.trainerize.com/v03/graph/getBodystats",
   "addbodystatsurl": "https://api.trainerize.com/v03/bodystats/add",
   "addbodystatsdataurl": "https://api.trainerize.com/v03/bodystats/set",
-  "performedexcersizesurl": "https://api.trainerize.com/v03/exercise/getPerformedExercises"
+  "performedexcersizesurl": "https://api.trainerize.com/v03/exercise/getPerformedExercises",
+  "addcustomexcersizeurl": "https://api.trainerize.com/v03/exercise/add"
 }

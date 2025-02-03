@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TrainerizeMigrate.API;
+
+namespace TrainerizeMigrate.Data
+{
+    public class Excersize
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string alternateName { get; set; }
+        public string description { get; set; }
+        public string recordType { get; set; }
+        public string videoType { get; set; }
+        public string videoUrl { get; set; }
+        public virtual List<Tag> tags { get; set; }
+        public int? new_id {  get; set; }
+    }
+}

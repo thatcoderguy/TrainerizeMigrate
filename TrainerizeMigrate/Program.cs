@@ -61,10 +61,9 @@ internal class Program
                     .AddChoices(mainMenuOptions)
             );
 
-
             switch (mainMenuSelection)
             {
-                case "[red]Extract Body Weight Data[/]":
+                case "[red]Export and Store Body Weight Data[/]":
                     bodyWeightManager.ExtractAndStoreData();
                     break;
 
@@ -72,15 +71,17 @@ internal class Program
                    bodyWeightManager.ImportExtractedData();
                     break;
 
-                case "[red]Extract Custom Excersizes[/]":
+                case "[red]Export and Store Custom Excersizes[/]":
                     excersizeManager.ExtractAndStoreData();
                     break;
 
                 case "[red]Import Custom Excersizes[/]":
                     break;
+                case "[red]Export and Store Phases and Workouts[/]":
+                    break;
                 case "[red]Import Phases and Workouts[/]":
                     break;
-                case "[red]Export Workout Session Data[/]":
+                case "[red]Export and Store Workout Session Data[/]":
                     break;
                 case "[red]Import Workout Session Data[/]":
                     break;
@@ -97,13 +98,13 @@ internal class Program
 
         return new List<string>
         {
-            "[red]Extract Body Weight Data[/]",
+            "[red]Export and Store Body Weight Data[/]",
             "[red]Import Body Weight Data[/]",
-            "[red]Extract Custom Excersizes[/]",
+            "[red]Export and Store Custom Excersizes[/]",
             "[red]Import Custom Excersizes[/]",
-            "[red]Export Phases and Workouts[/]",
+            "[red]Export and Store Phases and Workouts[/]",
             "[red]Import Phases and Workouts[/]",
-            "[red]Export Workout Session Data[/]",
+            "[red]Export and Store Workout Session Data[/]",
             "[red]Import Workout Session Data[/]",
             "[red]Exit[/]"
         };
