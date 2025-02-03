@@ -15,7 +15,7 @@ namespace TrainerizeMigrate.Migrations
         public virtual DbSet<BodyWeight> Body_Weight { get; set; }
         public virtual DbSet<WeightPoint> Body_Weight_Point { get; set; }
 
-        public virtual DbSet<Excersize> Excerisize { get; set; }
+        public virtual DbSet<CustomExcersize> Excerisize { get; set; }
 
         public virtual DbSet<Tag> Tag { get; set; }
 

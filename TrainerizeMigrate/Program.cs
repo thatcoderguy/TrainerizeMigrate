@@ -76,7 +76,9 @@ internal class Program
                     break;
 
                 case "[red]Import Custom Excersizes[/]":
+                    excersizeManager.ImportExtractedData();
                     break;
+
                 case "[red]Export and Store Phases and Workouts[/]":
                     break;
                 case "[red]Import Phases and Workouts[/]":

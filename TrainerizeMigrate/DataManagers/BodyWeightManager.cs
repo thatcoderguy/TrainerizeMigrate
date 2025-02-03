@@ -55,7 +55,6 @@ namespace TrainerizeMigrate.DataManagers
 
             if (bodyWeightData != null)
             {
-                AnsiConsole.Markup("[green]Importing body weight data into trainerize\n[/]");
                 PushBodyWeightData(authDetails, bodyWeightData);
                 AnsiConsole.Markup("[green]Import sucessful\n[/]");
 
@@ -284,7 +283,6 @@ namespace TrainerizeMigrate.DataManagers
 
             return false;
         }
-
 
         static ProgressColumn[] GetProgressColumns()
         {

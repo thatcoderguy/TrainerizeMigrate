@@ -13,6 +13,12 @@ namespace TrainerizeMigrate.API
         public object status { get; set; }
     }
 
+    public class CustomExcersizeRequestTag
+    {
+        public string type { get; set; }
+        public string name { get; set; }
+    }
+
     public class AddCustomExcersizeRequest
     {
         public string name { get; set; }
@@ -22,7 +28,7 @@ namespace TrainerizeMigrate.API
         public string type { get; set; }
         public object lastPerformed { get; set; }
         public string tag { get; set; }
-        public List<object> tags { get; set; }
+        public List<CustomExcersizeRequestTag> tags { get; set; }
         public int superSetID { get; set; }
         public ExcersizeMedia media { get; set; }
         public string videoType { get; set; }

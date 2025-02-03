@@ -7,7 +7,7 @@ using TrainerizeMigrate.API;
 
 namespace TrainerizeMigrate.Data
 {
-    public class Excersize
+    public class CustomExcersize
     {
         public int id { get; set; }
         public string name { get; set; }

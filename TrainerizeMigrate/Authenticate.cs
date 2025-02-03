@@ -70,5 +70,35 @@ namespace TrainerizeMigrate
 
             throw new Exception("Invalid login details");
         }
+
+        public static AuthenticationSession AuthenticateWithNewTrainerizeAsAdmin(Config config)
+        {
+            TrainerizeLoginRequest jsonBody = new TrainerizeLoginRequest()
+            {
+                email = config.Admin_Username(),
+                password = config.Admin_Password(),
+                groupUrl = config.Admin_Group(),
+                rememberMe = true
+            };
+
+            RestClient client = new RestClient();
+            var request = new RestRequest();
+            request.Resource = config.LoginUrl();
+            request.Method = Method.Post;
+            request.AddJsonBody(jsonBody, ContentType.Json);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var queryResult = client.Execute(request);
+
+            TrainerizeLoginResponse response = JsonSerializer.Deserialize<TrainerizeLoginResponse>(queryResult.Content);
+
+            if (response.code == 1)
+                return new AuthenticationSession()
+                {
+                    token = response.token.access_token,
+                    userId = response.userid
+                };
+
+            throw new Exception("Invalid login details");
+        }
     }
 }

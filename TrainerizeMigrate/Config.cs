@@ -15,6 +15,9 @@ namespace TrainerizeMigrate
         public string new_username { get; set; }
         public string new_password { get; set; }
         public string new_groupname { get; set; }
+        public string new_trainer_username { get; set; }
+        public string new_trainer_password { get; set; }
+        public string new_trainer_groupname { get; set; }
     }
 
     public class TrainerizeUrls
@@ -76,6 +79,21 @@ namespace TrainerizeMigrate
         public string New_GroupName()
         {
             return _authDetails.new_groupname;
+        }
+
+        public string Admin_Username()
+        {
+            return _authDetails.new_trainer_username;
+        }
+
+        public string Admin_Password()
+        {
+            return _authDetails.new_trainer_password;
+        }
+
+        public string Admin_Group()
+        {
+            return _authDetails.new_trainer_groupname;
         }
 
         public string LoginUrl()

@@ -12,6 +12,7 @@ using TrainerizeMigrate.Migrations;
 using System.Text.Json;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -48,22 +49,21 @@ namespace TrainerizeMigrate.DataManagers
         public bool ImportExtractedData()
         {
             AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
-            AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerize(_config);
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
-            /*
-            AnsiConsole.Markup("[green]Retreving body weight data from database\n[/]");
-            BodyWeight bodyWeightData = ReadBodyWeightData();
+            
+            AnsiConsole.Markup("[green]Retreving excersize data from database\n[/]");
+            List<Data.CustomExcersize> excersizes = ReadCustomExcersizesNotImported();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
 
-            if (bodyWeightData != null)
+            if (excersizes.Count > 0)
             {
-                AnsiConsole.Markup("[green]Importing body weight data into trainerize\n[/]");
-                PushBodyWeightData(authDetails, bodyWeightData);
+                PushCustomExcersizes(authDetails, excersizes);
                 AnsiConsole.Markup("[green]Import sucessful\n[/]");
 
                 return true;
-            }*/
+            }
 
             return false;
         }
@@ -107,7 +107,7 @@ namespace TrainerizeMigrate.DataManagers
             {
                 if (!_context.Excerisize.Any(x => x.id == excersize.id))
                 {
-                    Data.Excersize newExcersize = new Data.Excersize()
+                    CustomExcersize newExcersize = new CustomExcersize()
                     {
                         name = excersize.name,
                         id = excersize.id,
@@ -146,7 +146,117 @@ namespace TrainerizeMigrate.DataManagers
 
             }
 
+            return true;
+        }
+
+        private List<CustomExcersize> ReadCustomExcersizesNotImported()
+        {
+            List<Data.CustomExcersize> excersizeList = _context.Excerisize.Include(x => x.tags).Where(x => x.new_id == null).ToList();
+            return excersizeList;
+        }
+
+        private void UpdateExcersize(int excersizeId, int newExcersizeId)
+        {
+            CustomExcersize excersize = _context.Excerisize.FirstOrDefault(x => x.id == excersizeId);
+            excersize.new_id = newExcersizeId;
+            _context.Excerisize.Update(excersize);
+            _context.SaveChanges();
+        }
+
+        private bool PushCustomExcersizes(AuthenticationSession authDetails, List<CustomExcersize> excersizeList)
+        {
+
+            AnsiConsole.Progress()
+                .Columns(GetProgressColumns())
+                .Start(async ctx =>
+                {
+                    var task = ctx.AddTask($"[green]Importing custom excersize data...[/]", autoStart: false);
+                    task.MaxValue = excersizeList.Count;
+                    task.StartTask();
+
+                    foreach (CustomExcersize excersize in excersizeList)
+                    {
+                        int newExcersizeId = AddCustomExcersize(authDetails, excersize);
+                        UpdateExcersize(excersize.id, newExcersizeId);
+
+                        task.Increment(1);
+                    }
+                    task.StopTask();
+                });
+
+
             return false;
+        }
+
+        private List<CustomExcersizeRequestTag> ConvertDBTagsToRequestTags(List<Data.Tag> tags)
+        {
+            List<CustomExcersizeRequestTag> tagsList = new List<CustomExcersizeRequestTag>();
+            foreach (Data.Tag tag in tags)
+            {
+                tagsList.Add(new CustomExcersizeRequestTag()
+                {
+                    type = tag.type,
+                    name = tag.name
+                });
+            }
+            return tagsList;
+        }
+
+        private int AddCustomExcersize(AuthenticationSession authDetails, CustomExcersize excersize)
+        {
+
+            AddCustomExcersizeRequest jsonBody = new AddCustomExcersizeRequest()
+            {
+                alternateName = excersize.alternateName,
+                description = excersize.description,
+                lastPerformed = null,
+                name = excersize.name,
+                recordType = excersize.recordType,
+                superSetID = 0,
+                tag = "none",
+                type = "custom",
+                videoType = excersize.videoType,
+                videoUrl = excersize.videoUrl,
+                videoURL = excersize.videoUrl,
+                media = new ExcersizeMedia()
+                {
+                    status = null,
+                    token = excersize.videoUrl,
+                    type = excersize.videoType
+                },
+                tags = ConvertDBTagsToRequestTags(excersize.tags)
+            };
+
+            var authenticator = new JwtAuthenticator(authDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.AddCustomExcersizeUrl();
+            request.Method = Method.Post;
+            request.AddJsonBody(jsonBody, ContentType.Json);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var queryResult = client.Execute(request);
+
+            AddCustomExcersizeResponse response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
+
+            return response.id;
+
+        }
+
+        static ProgressColumn[] GetProgressColumns()
+        {
+            List<ProgressColumn> progressColumns;
+
+            progressColumns = new List<ProgressColumn>()
+            {
+                new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()
+            };
+
+            return progressColumns.ToArray();
         }
     }
 }
