@@ -20,12 +20,11 @@ namespace TrainerizeMigrate
     public class TrainerizeUrls
     {
         public string loginurl { get; set; }
-        public string bodystatsdataurl { get; set; }
-        public string bodystatsaddurl { get; set; }
-        public string bodystatsdataadddataurl { get; set; }
+        public string getbodystatsdataurl { get; set; }
+        public string addbodystatsurl { get; set; }
+        public string addbodystatsdataurl { get; set; }
 
     }
-
 
     public class Config
     {
@@ -82,19 +81,19 @@ namespace TrainerizeMigrate
             return _trainerizeurls.loginurl;
         }
 
-        public string GetBodyStatsUrl()
+        public string GetBodyStatsDataUrl()
         {
-            return _trainerizeurls.bodystatsdataurl;
+            return _trainerizeurls.getbodystatsdataurl;
         }
 
-        public string AddBodyStatsUrl()
+        public string AddBodyStatUrl()
         {
-            return _trainerizeurls.bodystatsaddurl;
+            return _trainerizeurls.addbodystatsurl;
         }
 
-        public string AddBodyStatsDataUrl()
+        public string AddBodyStatDataUrl()
         {
-            return _trainerizeurls.bodystatsdataadddataurl;
+            return _trainerizeurls.addbodystatsdataurl;
         }
     }
 }

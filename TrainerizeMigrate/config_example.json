@@ -4,5 +4,8 @@
   "original_groupname": "",
   "new_username": "",
   "new_password": "",
-  "new_groupname": ""
+  "new_groupname": "",
+  "new_trainer_username": "",
+  "new_trainer_password": "",
+  "new_trainer_groupname": ""
 }

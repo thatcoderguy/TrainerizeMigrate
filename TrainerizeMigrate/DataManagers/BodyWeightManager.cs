@@ -11,6 +11,7 @@ using TrainerizeMigrate.Migrations;
 using TrainerizeMigrate.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Nodes;
+using Spectre.Console;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -27,22 +28,37 @@ namespace TrainerizeMigrate.DataManagers
 
         public bool ExtractAndStoreData()
         {
+            AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
             AuthenticationSession authDetails = Authenticate.AuthenticateWithOriginalTrainerize(_config);
-            BodyWeightResponse bodyWeightData = PullBodyWeightData(authDetails);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
+            AnsiConsole.Markup("[green]Pulling body weight data from trainerize\n[/]");
+            BodyWeightResponse bodyWeightData = PullBodyWeightData(authDetails);
+            AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
+
+            AnsiConsole.Markup("[green]Storing body weight data into database\n[/]");
             StoreBodyWeightData(bodyWeightData);
+            AnsiConsole.Markup("[green]Data storage successful\n[/]");
 
             return true;
         }
 
         public bool ImportExtractedData()
         {
+            AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
             AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerize(_config);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
+
+            AnsiConsole.Markup("[green]Retreving body weight data from database\n[/]");
             BodyWeight bodyWeightData = ReadBodyWeightData();
+            AnsiConsole.Markup("[green]Data retrival successful\n[/]");
 
             if (bodyWeightData != null)
             {
+                AnsiConsole.Markup("[green]Importing body weight data into trainerize\n[/]");
                 PushBodyWeightData(authDetails, bodyWeightData);
+                AnsiConsole.Markup("[green]Import sucessful\n[/]");
+
                 return true;
             }
 
@@ -83,7 +99,7 @@ namespace TrainerizeMigrate.DataManagers
             };
             RestClient client = new RestClient(options);
             var request = new RestRequest();
-            request.Resource = _config.GetBodyStatsUrl();
+            request.Resource = _config.GetBodyStatsDataUrl();
             request.Method = Method.Post;
             request.AddJsonBody(jsonBody, ContentType.Json);
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
@@ -180,7 +196,7 @@ namespace TrainerizeMigrate.DataManagers
             };
             RestClient client = new RestClient(options);
             var request = new RestRequest();
-            request.Resource = _config.AddBodyStatsUrl();
+            request.Resource = _config.AddBodyStatUrl();
             request.Method = Method.Post;
             request.AddJsonBody(jsonBody, ContentType.Json);
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
@@ -240,7 +256,7 @@ namespace TrainerizeMigrate.DataManagers
             };
             RestClient client = new RestClient(options);
             var request = new RestRequest();
-            request.Resource = _config.AddBodyStatsDataUrl();
+            request.Resource = _config.AddBodyStatDataUrl();
             request.Method = Method.Post;
             request.AddJsonBody(jsonBody, ContentType.Json);
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
