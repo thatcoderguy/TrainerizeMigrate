@@ -10,11 +10,10 @@ using TrainerizeMigrate.DataManagers;
 
 ApplicationDbContext db = new ApplicationDbContext();
 Config config = new Config();
-
 Console.WriteLine(db.DbPath);
-
-
 db.Database.Migrate();
+
+//build a menu
 
 Console.WriteLine("Retreiving body weight data");
 
@@ -27,6 +26,12 @@ Console.WriteLine("Importing body weight data");
 
 
 bodyWeightManager.ImportExtractedData();
+
+//excersize manager
+
+//workout manager
+
+//training session manager
 
 
 Console.WriteLine("Done. Press Any Key");
