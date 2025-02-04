@@ -78,10 +78,17 @@ internal class Program
                 case "[red]Import Custom Excersizes[/]":
                     excersizeManager.ImportExtractedData();
                     break;
-
-                case "[red]Export and Store Phases and Workouts[/]":
+                case "[red]Export and Store Programs[/]":
                     break;
-                case "[red]Import Phases and Workouts[/]":
+                case "[red]Import Programs[/]":
+                    break;
+                case "[red]Export and Store Phases[/]":
+                    break;
+                case "[red]Import Phases[/]":
+                    break;
+                case "[red]Export and Store Phased Workout Plans[/]":
+                    break;
+                case "[red]Phased Workout Plans[/]":
                     break;
                 case "[red]Export and Store Workout Session Data[/]":
                     break;
@@ -104,8 +111,12 @@ internal class Program
             "[red]Import Body Weight Data[/]",
             "[red]Export and Store Custom Excersizes[/]",
             "[red]Import Custom Excersizes[/]",
-            "[red]Export and Store Phases and Workouts[/]",
-            "[red]Import Phases and Workouts[/]",
+            "[red]Export and Store Programs[/]",
+            "[red]Import Programs[/]",
+            "[red]Export and Store Phases[/]",
+            "[red]Import Phases[/]",
+            "[red]Export and Store Phased Workout Plans[/]",
+            "[red]Import Phased Workout Plans[/]",
             "[red]Export and Store Workout Session Data[/]",
             "[red]Import Workout Session Data[/]",
             "[red]Exit[/]"
@@ -113,3 +124,4 @@ internal class Program
 
     }
 }
+
