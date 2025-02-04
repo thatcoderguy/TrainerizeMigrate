@@ -78,22 +78,37 @@ internal class Program
                 case "[red]Import Custom Excersizes[/]":
                     excersizeManager.ImportExtractedData();
                     break;
+
                 case "[red]Export and Store Programs[/]":
+                    workoutManager.ExtractAndStoreTrainingPrograms();
                     break;
+
                 case "[red]Import Programs[/]":
+                    workoutManager.ImportWorkoutPlans();
                     break;
+
                 case "[red]Export and Store Phases[/]":
+                    workoutManager.ExtractAndStoreTrainingProgramPhases();
                     break;
+
                 case "[red]Import Phases[/]":
+                    workoutManager.ImportTrainingProgramPhases();
                     break;
+
                 case "[red]Export and Store Phased Workout Plans[/]":
+                    workoutManager.ExtractAndStoreWorkoutPlans();
                     break;
+
                 case "[red]Phased Workout Plans[/]":
+                    workoutManager.ImportWorkoutPlans();
                     break;
+
                 case "[red]Export and Store Workout Session Data[/]":
                     break;
+
                 case "[red]Import Workout Session Data[/]":
                     break;
+
                 case "[red]Exit[/]":
                     return (true, false); // Return false to indicate exit
             }

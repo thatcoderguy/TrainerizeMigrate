@@ -17,11 +17,43 @@ namespace TrainerizeMigrate.DataManagers
             _config = config;
             _context = context;
         }
-        //pull out programs
-        //pull out phases
-        //pull out workout plans
-        //import plans
-        //import phases into new system
-        //import workout plans into new system
+
+        public void ExtractAndStoreTrainingPrograms()
+        {
+
+        }
+        public void ImportTrainingPrograms()
+        {
+
+        }
+        public void ExtractAndStoreTrainingProgramPhases()
+        {
+
+        }
+
+        public void ImportTrainingProgramPhases()
+        {
+
+        }
+
+        public void ExtractAndStoreWorkouts()
+        {
+
+        }
+
+        public void ImportWorkouts()
+        {
+
+        }
+
+        public void ExtractAndStoreWorkoutPlans()
+        {
+
+        }
+
+        public void ImportWorkoutPlans()
+        {
+
+        }
     }
 }
