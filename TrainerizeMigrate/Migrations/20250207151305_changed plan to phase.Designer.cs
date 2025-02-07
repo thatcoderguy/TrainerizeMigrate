@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrainerizeMigrate.Migrations;
 
@@ -10,9 +11,11 @@ using TrainerizeMigrate.Migrations;
 namespace TrainerizeMigrate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250207151305_changed plan to phase")]
+    partial class changedplantophase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -91,7 +94,7 @@ namespace TrainerizeMigrate.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("new_id")
+                    b.Property<int>("new_id")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("id");
@@ -105,13 +108,6 @@ namespace TrainerizeMigrate.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("duration")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("durationType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("endDate")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -120,15 +116,14 @@ namespace TrainerizeMigrate.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("modified")
-                        .IsRequired()
+                    b.Property<DateTime>("modified")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("new_id")
+                    b.Property<int>("new_id")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("planType")

@@ -16,7 +16,7 @@ namespace TrainerizeMigrate.Data
         public string instruction { get; set; }
         public string accessLevel { get; set; }
         public virtual List<WorkoutExcersize> excersizes { get; set; }
-        public int new_id { get; set; }
+        public int? new_id { get; set; }
 
     }
 }

@@ -3884,3 +3884,55 @@ https://api.trainerize.com/v03/workoutDef/get
         }
     ]
 }
+
+
+-----------------------------------------
+
+
+https://api.trainerize.com/v03/trainingPlan/add
+{"userid":21810050,"plan":{"name":"test","startDate":"2025-02-07","endDate":"","duration":4,"durationType":"month"}}
+{
+    "code": "0",
+    "id": 28547114,
+    "name": "test",
+    "instruction": null,
+    "startDate": "2/7/2025 12:00:00 AM",
+    "duration": 4,
+    "durationType": "4 months (7 Feb 2025 - 6 Jun 2025)",
+    "endDate": "6/6/2025 12:00:00 AM",
+    "planType": 0,
+    "version": null,
+    "numberOfWorkouts": 0
+}
+
+
+{"userid":21810050,"plan":{"name":"tests","startDate":"2025-06-07","endDate":"2025-06-26","duration":3,"durationType":"specificDate"}}
+{
+    "code": "0",
+    "id": 28547142,
+    "name": "tests",
+    "instruction": null,
+    "startDate": "6/7/2025 12:00:00 AM",
+    "duration": null,
+    "durationType": "3 weeks (7 Jun 2025 - 26 Jun 2025)",
+    "endDate": "6/26/2025 12:00:00 AM",
+    "planType": 0,
+    "version": null,
+    "numberOfWorkouts": 0
+}
+
+
+{"userid":21810050,"plan":{"name":"bbb","startDate":"2025-06-27","endDate":"","duration":4,"durationType":"week"}}
+{
+    "code": "0",
+    "id": 28547152,
+    "name": "bbb",
+    "instruction": null,
+    "startDate": "6/27/2025 12:00:00 AM",
+    "duration": 4,
+    "durationType": "4 weeks (27 Jun 2025 - 24 Jul 2025)",
+    "endDate": "7/24/2025 12:00:00 AM",
+    "planType": 0,
+    "version": null,
+    "numberOfWorkouts": 0
+}

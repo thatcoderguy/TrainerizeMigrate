@@ -17,7 +17,7 @@ namespace TrainerizeMigrate.Migrations
         public virtual DbSet<CustomExcersize> Excerisize { get; set; }
         public virtual DbSet<Tag> Tag { get; set; }
         public virtual DbSet<TrainingProgram> TrainingProgram { get; set; }
-        public virtual DbSet<ProgramPlan> TrainingProgramPlan { get; set; }
+        public virtual DbSet<ProgramPhase> TrainingProgramPhase { get; set; }
         public virtual DbSet<PlanWorkout> TrainingPlanWorkout { get; set; }
         public virtual DbSet<WorkoutExcersize> WorkoutExcersize { get; set; }
 

@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrainerizeMigrate.Data
+namespace TrainerizeMigrate.API
 {
-    public class TrainingProgram
+    public class TrainingProgramListResponse
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
+        public List<Program> programs { get; set; }
+    }
+
+    public class Program
+    {
+        public int? userProgramID { get; set; }
         public int id { get; set; }
         public string name { get; set; }
         public string durationType { get; set; }
-        public string subscriptionType { get; set; }
+        public string subscribeType { get; set; }
         public string startDate { get; set; }
         public string endDate { get; set; }
+        public bool isEmpty { get; set; }
         public string accessLevel { get; set; }
+        public string? userGroup { get; set; }
     }
 }

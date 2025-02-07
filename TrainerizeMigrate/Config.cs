@@ -28,7 +28,11 @@ namespace TrainerizeMigrate
         public string addbodystatsdataurl { get; set; }
         public string performedexcersizesurl { get; set; }
         public string addcustomexcersizeurl {  get; set; }
-
+        public string gettrainingprogramsurl { get; set; }
+        public string gettrainingprogramphasesurl { get; set; }
+        public string gettrainingphaseworkoutsurl { get; set; }
+        public string getworkoutplandetailsurl { get; set; }
+        public string addprogramphaseurl { get; set; }
     }
 
     public class Config
@@ -124,6 +128,31 @@ namespace TrainerizeMigrate
         public string AddCustomExcersizeUrl()
         {
             return _trainerizeurls.addcustomexcersizeurl;
+        }
+
+        public string GetTrainingProgramsUrl()
+        {
+            return _trainerizeurls.gettrainingprogramsurl;
+        }
+
+        public string GetTrainingProgramPhasesUrl()
+        {
+            return _trainerizeurls.gettrainingprogramphasesurl;
+        }
+
+        public string GetPhaseWorkoutsUrl()
+        {
+            return _trainerizeurls.gettrainingphaseworkoutsurl;
+        }
+
+        public string GetWorkoutPlanDetailsUrl()
+        {
+            return _trainerizeurls.getworkoutplandetailsurl;
+        }
+
+        public string AddTrainingPhaseUrl()
+        {
+            return _trainerizeurls.addprogramphaseurl;
         }
     }
 }

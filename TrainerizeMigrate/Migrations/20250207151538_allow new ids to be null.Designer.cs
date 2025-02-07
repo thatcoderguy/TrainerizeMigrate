@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrainerizeMigrate.Migrations;
 
@@ -10,9 +11,11 @@ using TrainerizeMigrate.Migrations;
 namespace TrainerizeMigrate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250207151538_allow new ids to be null")]
+    partial class allownewidstobenull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -104,13 +107,6 @@ namespace TrainerizeMigrate.Migrations
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<int?>("duration")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("durationType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("endDate")
                         .IsRequired()

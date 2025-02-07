@@ -4,5 +4,10 @@
   "addbodystatsurl": "https://api.trainerize.com/v03/bodystats/add",
   "addbodystatsdataurl": "https://api.trainerize.com/v03/bodystats/set",
   "performedexcersizesurl": "https://api.trainerize.com/v03/exercise/getPerformedExercises",
-  "addcustomexcersizeurl": "https://api.trainerize.com/v03/exercise/add"
+  "addcustomexcersizeurl": "https://api.trainerize.com/v03/exercise/add",
+  "gettrainingprogramsurl": "https://api.trainerize.com/v03/program/getUserProgramList",
+  "gettrainingprogramphasesurl": "https://api.trainerize.com/v03/program/getUserProgramTrainingPlanList",
+  "gettrainingphaseworkoutsurl": "https://api.trainerize.com/v03/trainingPlan/getWorkoutDefList",
+  "getworkoutplandetailsurl": "https://api.trainerize.com/v03/workoutDef/get",
+  "addprogramphaseurl": "https://api.trainerize.com/v03/trainingPlan/add"
 }

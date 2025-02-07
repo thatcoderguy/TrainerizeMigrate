@@ -80,6 +80,7 @@ internal class Program
                     excersizeManager.ImportExtractedData();
                     break;
 
+                /*  NOT NEEDED AS TRAINERIZE ONLY ALLOWS 1 PROGRAM PER CLIENT
                 case "[red]Export and Store Programs[/]":
                     workoutManager.ExtractAndStoreTrainingPrograms();
                     break;
@@ -87,6 +88,7 @@ internal class Program
                 case "[red]Import Programs[/]":
                     workoutManager.ImportWorkoutPlans();
                     break;
+                */
 
                 case "[red]Export and Store Phases[/]":
                     workoutManager.ExtractAndStoreTrainingProgramPhases();
