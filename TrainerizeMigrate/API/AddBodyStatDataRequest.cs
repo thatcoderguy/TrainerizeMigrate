@@ -41,7 +41,7 @@ namespace TrainerizeMigrate.API
     public class AddBodyStatDataRequest
     {
         public BodyMeasures bodyMeasures { get; set; }
-        public int id { get; set; }
+        public int? id { get; set; }
         public string date { get; set; }
         public string unitBodystats { get; set; }
         public string unitWeight { get; set; }

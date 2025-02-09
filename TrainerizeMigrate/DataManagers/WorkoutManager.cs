@@ -64,7 +64,17 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
 
-            TrainingProgramListResponse response = JsonSerializer.Deserialize<TrainingProgramListResponse>(queryResult.Content);
+            TrainingProgramListResponse response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<TrainingProgramListResponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
 
             return response;
         }
@@ -133,7 +143,17 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
 
-            ProgramPhasesResponse response = JsonSerializer.Deserialize<ProgramPhasesResponse>(queryResult.Content);
+            ProgramPhasesResponse response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<ProgramPhasesResponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
 
             return response;
         }
@@ -171,9 +191,6 @@ namespace TrainerizeMigrate.DataManagers
             AuthenticationSession clientAuthDetails = Authenticate.AuthenticateWithNewTrainerize(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
-            AnsiConsole.Markup("[green]Retreving program ID from Trainerize\n[/]");
-            int TrainingProgramId = GetTrainingProgramId(trainerAuthDetails);
-
             AnsiConsole.Markup("[green]Retreving program phases from database\n[/]");
             List<ProgramPhase> phases = ReadTrainingPhasesNotImported();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
@@ -201,8 +218,10 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (ProgramPhase phase in phases)
                     {
-                        int newPhaseId = AddProgramPhase(authDetails, phase, clientID);
-                        UpdatePhase(phase.id, newPhaseId);
+                        AnsiConsole.Markup("[green]Adding Phase " + phase.name + "\n[/]");
+                        int? newPhaseId = AddProgramPhase(authDetails, phase, clientID);
+                        if(newPhaseId is not null) 
+                            UpdatePhase(phase.id, newPhaseId);
 
                         task.Increment(1);
                     }
@@ -212,7 +231,7 @@ namespace TrainerizeMigrate.DataManagers
             return false;
         }
 
-        private int AddProgramPhase(AuthenticationSession authDetails, ProgramPhase phase, int clientID)
+        private int? AddProgramPhase(AuthenticationSession authDetails, ProgramPhase phase, int clientID)
         {
             AddProgramPhaseRequest jsonBody = new AddProgramPhaseRequest()
             {
@@ -241,12 +260,22 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             RestResponse queryResult = client.Execute(request);
 
-            AddCustomExcersizeResponse response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
+            AddCustomExcersizeResponse response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
 
             return response.id;
         }
 
-        private bool UpdatePhase(int oldPhaseId, int newPhaseId)
+        private bool UpdatePhase(int oldPhaseId, int? newPhaseId)
         {
             ProgramPhase programPhase = _context.TrainingProgramPhase.FirstOrDefault(x => x.id == oldPhaseId);
             programPhase.new_id = newPhaseId;
@@ -255,7 +284,7 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
-        private int GetTrainingProgramId(AuthenticationSession authDetails)
+        private int? GetTrainingProgramId(AuthenticationSession authDetails)
         {
             TrainingProgramListRequest jsonBody = new TrainingProgramListRequest()
             {
@@ -276,7 +305,17 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
 
-            TrainingProgramListResponse response = JsonSerializer.Deserialize<TrainingProgramListResponse>(queryResult.Content);
+            TrainingProgramListResponse response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<TrainingProgramListResponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
 
             int programID = response.programs[0].id;
 
@@ -326,6 +365,7 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (ProgramPhase phase in phases)
                     {
+                        AnsiConsole.Markup("[green]Pulling woorkouts for phase" + phase.name + "\n[/]");
                         PhaseWorkoutPlansResponse phaseWorkouts = PullPhaseWorkouts(authDetails, phase.id);
 
                         phaseWorkoutPlansResponses.Add(phaseWorkouts);
@@ -372,6 +412,7 @@ namespace TrainerizeMigrate.DataManagers
             }
             catch (Exception ex)
             {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
                 return null;
             }
            

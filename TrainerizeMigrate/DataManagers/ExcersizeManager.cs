@@ -92,7 +92,18 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
 
-            ExcersizeListResponse response = JsonSerializer.Deserialize<ExcersizeListResponse>(queryResult.Content);
+            ExcersizeListResponse response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<ExcersizeListResponse>(queryResult.Content); ;
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
+
 
             return response;
         }
@@ -157,7 +168,7 @@ namespace TrainerizeMigrate.DataManagers
             return excersizeList;
         }
 
-        private void UpdateExcersize(int excersizeId, int newExcersizeId)
+        private void UpdateExcersize(int excersizeId, int? newExcersizeId)
         {
             CustomExcersize excersize = _context.Excerisize.FirstOrDefault(x => x.id == excersizeId);
             excersize.new_id = newExcersizeId;
@@ -178,8 +189,9 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (CustomExcersize excersize in excersizeList)
                     {
-                        int newExcersizeId = AddCustomExcersize(authDetails, excersize);
-                        UpdateExcersize(excersize.id, newExcersizeId);
+                        int? newExcersizeId = AddCustomExcersize(authDetails, excersize);
+                        if(newExcersizeId is not null)
+                            UpdateExcersize(excersize.id, newExcersizeId);
 
                         task.Increment(1);
                     }
@@ -204,7 +216,7 @@ namespace TrainerizeMigrate.DataManagers
             return tagsList;
         }
 
-        private int AddCustomExcersize(AuthenticationSession authDetails, CustomExcersize excersize)
+        private int? AddCustomExcersize(AuthenticationSession authDetails, CustomExcersize excersize)
         {
 
             if (excersize.videoType == "youtube")
@@ -249,7 +261,19 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             RestResponse queryResult =  queryResult = client.Execute(request);
 
-            AddCustomExcersizeResponse response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
+            AddCustomExcersizeResponse response = null;
+
+
+            try
+            {
+                response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
+
 
             return response.id;
         }

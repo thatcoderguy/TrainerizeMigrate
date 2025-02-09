@@ -104,7 +104,17 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
 
-            BodyWeightResponse? response = JsonSerializer.Deserialize<BodyWeightResponse>(queryResult.Content);
+            BodyWeightResponse? response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<BodyWeightResponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
 
             return response;
         }
@@ -165,13 +175,15 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (WeightPoint weightPoint in bodyWeightData.points)
                     {
-                        int BodyStatId = CreateBodyStat(authDetails, weightPoint.date);
+                        int? BodyStatId = CreateBodyStat(authDetails, weightPoint.date);
 
-                        if (AddBodyStatsData(authDetails, BodyStatId, weightPoint.value, weightPoint.date))
-                            UpdateBodyWeightPointToUpdated(weightPoint.id, BodyStatId);
-                        else
-                            AnsiConsole.Markup("[red]Body stat already exists for date: " + weightPoint.date + "\n[/]");
-
+                        if (BodyStatId != null)
+                        {
+                            if (AddBodyStatsData(authDetails, BodyStatId, weightPoint.value, weightPoint.date))
+                                UpdateBodyWeightPointToUpdated(weightPoint.id, BodyStatId);
+                            else
+                                AnsiConsole.Markup("[red]Body stat already exists for date: " + weightPoint.date + "\n[/]");
+                        }
 
                         task.Increment(1);
                     }
@@ -182,7 +194,7 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
-        private bool UpdateBodyWeightPointToUpdated(int bodyWeightId, int newBodyStatsId)
+        private bool UpdateBodyWeightPointToUpdated(int bodyWeightId, int? newBodyStatsId)
         {
             WeightPoint? point = _context.Body_Weight_Point.FirstOrDefault(x => x.id == bodyWeightId);
             point.newbodystatid = newBodyStatsId;
@@ -193,7 +205,7 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
-        private int CreateBodyStat(AuthenticationSession authDetails, string date)
+        private int? CreateBodyStat(AuthenticationSession authDetails, string date)
         {
             AddBodyStatRequest jsonBody = new AddBodyStatRequest()
             {
@@ -216,12 +228,23 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
 
-            AddBodyStatResponse? response = JsonSerializer.Deserialize<AddBodyStatResponse>(queryResult.Content);
+            AddBodyStatResponse? response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<AddBodyStatResponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
+
 
             return response.bodyStatsID;
         }
 
-        private bool AddBodyStatsData(AuthenticationSession authDetails, int bodyStatsID, double? bodyWeight, string date)
+        private bool AddBodyStatsData(AuthenticationSession authDetails, int? bodyStatsID, double? bodyWeight, string date)
         {
             AddBodyStatDataRequest jsonBody = new AddBodyStatDataRequest() { 
                 date = date,
@@ -275,8 +298,18 @@ namespace TrainerizeMigrate.DataManagers
             request.AddJsonBody(jsonBody, ContentType.Json);
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
-            
-            AddBodyStatDataReponse? response = JsonSerializer.Deserialize<AddBodyStatDataReponse>(queryResult.Content);
+
+            AddBodyStatDataReponse? response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<AddBodyStatDataReponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return false;
+            }
 
             if (response.code == 0)
                 return true;
