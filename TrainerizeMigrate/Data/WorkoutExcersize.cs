@@ -17,5 +17,9 @@ namespace TrainerizeMigrate.Data
         public int sets { get; set; }
         public string target { get; set; }
         public int restTime { get; set; }
+        public int superSetID { get; set; }
+        public int targetDetailType { get; set; }
+        public int targetDetailTime { get; set; }
+        public int targetDetailText { get; set; }
     }
 }

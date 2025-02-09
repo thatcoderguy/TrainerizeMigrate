@@ -368,7 +368,7 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (ProgramPhase phase in phases)
                     {
-                        AnsiConsole.Markup("[green]Pulling woorkouts for phase" + phase.name + "\n[/]");
+                        AnsiConsole.Markup("[green]Pulling workouts for phase: " + phase.name + "\n[/]");
                         PhaseWorkoutPlansResponse phaseWorkouts = PullPhaseWorkouts(authDetails, phase.id);
 
                         phaseWorkoutPlansResponses.Add(phaseWorkouts);

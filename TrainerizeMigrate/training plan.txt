@@ -1,4 +1,45 @@
 
+
+
+https://api.trainerize.com/v03/workoutDef/add
+
+{"type":"trainingPlan","userID":21731103,"trainingPlanID":28579798,
+    "workoutDef": {"name":"ddddd","instructions":"","type":"workoutRegular",
+    "exercises":[{
+            "def":{"restTime":90,"superSetID":0,"id":350,"sets":3,"targetDetail":{"type":10}}},
+            {"def":{"restTime":90,"superSetID":0,"id":15170201,"sets":3,"targetDetail":{"type":10,"text":"sdsdsdd"},"target":"sdsdsdd"}},
+            {"def":{"id":326,"restTime":90,"intervalTime":90,"sets":1,"superSetID":0,"targetDetail":{"time":90,"type":2}}},
+            {"def":{"restTime":90,"superSetID":0,"id":367,"sets":3,"targetDetail":{"type":2,"time":30,"text":"xxxxx"},"target":"xxxxx"}}],
+            "trackingStats":{
+                "def":{
+                    "def":{
+                        "effortInterval":false,"restInterval":false,"minHeartRate":false,"maxHeartRate":false,"avgHeartRate":false,"zone":false}}},
+            "tags":[],
+            "rounds":1}}
+
+
+
+
+{"type":"trainingPlan","userID":21731103,"trainingPlanID":28579798,
+    "workoutDef":{"name":"sdddfffddf","instructions":"","type":"workoutRegular",
+        "exercises":[
+            {"def":{"id":14840827,"superSetID":0,"sets":3,"target":"cccccccccc","targetDetail":{"type":10,"text":"cccccccccc"},"intervalTime":0,"restTime":90}},
+            {"def":{"id":84,"superSetID":0,"sets":3,"target":"ccccccccccc","targetDetail":{"type":10,"text":"ccccccccccc"},"intervalTime":0,"restTime":90}},
+            {"def":{"id":15021016,"superSetID":0,"sets":3,"target":"ccccccccc","targetDetail":{"type":2,"text":"ccccccccc","time":30},"intervalTime":0,"restTime":90}},
+            {"def":{"id":14824414,"superSetID":1,"sets":5,"target":"ddd","targetDetail":{"type":10,"text":"ddd"},"intervalTime":0,"restTime":15,"supersetType":"superset"}},
+            {"def":{"id":2429,"superSetID":1,"sets":5,"target":"dddd","targetDetail":{"type":10,"text":"dddd"},"intervalTime":0,"restTime":90,"supersetType":"superset"}}],
+            
+            "trackingStats":{"def":{"def":{"effortInterval":false,"restInterval":false,"minHeartRate":false,"maxHeartRate":false,"avgHeartRate":false,"zone":false}}},"tags":[],"rounds":1}}
+
+
+
+
+{"workoutID":173612871}
+
+
+-----------------------------------
+
+
 https://api.trainerize.com/v03/trainingPlan/delete
 {"planid":28547813,"closeGap":false}
 {"code":"0"}
