@@ -435,6 +435,11 @@ namespace TrainerizeMigrate.DataManagers
 
         }
 
+        internal void DeleteAllPhases()
+        {
+            throw new NotImplementedException();
+        }
+
         static ProgressColumn[] GetProgressColumns()
         {
             List<ProgressColumn> progressColumns;
@@ -446,5 +451,7 @@ namespace TrainerizeMigrate.DataManagers
 
             return progressColumns.ToArray();
         }
+
+
     }
 }

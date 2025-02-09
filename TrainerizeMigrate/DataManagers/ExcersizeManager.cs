@@ -54,7 +54,7 @@ namespace TrainerizeMigrate.DataManagers
             AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
-            
+
             AnsiConsole.Markup("[green]Retreving excersize data from database\n[/]");
             List<Data.CustomExcersize> excersizes = ReadCustomExcersizesNotImported();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
@@ -134,8 +134,8 @@ namespace TrainerizeMigrate.DataManagers
                     };
 
                     List<Data.Tag> newTags = new List<Data.Tag>();
-                    
-                    foreach(API.Tag tag in excersize.tags)
+
+                    foreach (API.Tag tag in excersize.tags)
                     {
                         newTags.Add(new Data.Tag()
                         {
@@ -155,7 +155,7 @@ namespace TrainerizeMigrate.DataManagers
                     AnsiConsole.Markup("[green]Added excersize: " + excersize.name + "\n[/]");
 
                 } else
-                    AnsiConsole.Markup("[red]Excersize: " + excersize.name +  " already exists!\n[/]");
+                    AnsiConsole.Markup("[red]Excersize: " + excersize.name + " already exists!\n[/]");
 
             }
 
@@ -165,6 +165,12 @@ namespace TrainerizeMigrate.DataManagers
         private List<CustomExcersize> ReadCustomExcersizesNotImported()
         {
             List<CustomExcersize> excersizeList = _context.Excerisize.Include(x => x.tags).Where(x => x.new_id == null).ToList();
+            return excersizeList;
+        }
+
+        private List<CustomExcersize> ReadCustomExcersizesImported()
+        {
+            List<CustomExcersize> excersizeList = _context.Excerisize.Include(x => x.tags).Where(x => x.new_id != null).ToList();
             return excersizeList;
         }
 
@@ -190,8 +196,13 @@ namespace TrainerizeMigrate.DataManagers
                     foreach (CustomExcersize excersize in excersizeList)
                     {
                         int? newExcersizeId = AddCustomExcersize(authDetails, excersize);
-                        if(newExcersizeId is not null)
+
+                        if (newExcersizeId is not null)
                             UpdateExcersize(excersize.id, newExcersizeId);
+                        else
+                            AnsiConsole.Markup("[red]Excersize " + excersize.name + " aleady exists\n[/]");
+
+
 
                         task.Increment(1);
                     }
@@ -221,7 +232,7 @@ namespace TrainerizeMigrate.DataManagers
 
             if (excersize.videoType == "youtube")
                 if (!CheckYouTubeVideoExists(excersize.videoUrl))
-                { 
+                {
                     excersize.videoType = "none";
                     excersize.videoUrl = string.Empty;
                 }
@@ -259,21 +270,21 @@ namespace TrainerizeMigrate.DataManagers
             request.Method = Method.Post;
             request.AddJsonBody(jsonBody, ContentType.Json);
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-            RestResponse queryResult =  queryResult = client.Execute(request);
+            RestResponse queryResult = queryResult = client.Execute(request);
 
             AddCustomExcersizeResponse response = null;
-
 
             try
             {
                 response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
+                if (response.id == 0)
+                    return null;
             }
             catch (Exception ex)
             {
                 AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
                 return null;
             }
-
 
             return response.id;
         }
@@ -283,12 +294,96 @@ namespace TrainerizeMigrate.DataManagers
             HttpClient _client = new HttpClient();
             HttpResponseMessage response = _client.GetAsync("https://www.youtube.com/embed/" + videoToken + "?autoplay=0&rel=0&modestbranding=1&wmode=transparent&showInfo=0").Result;
 
-            string contentText =  response.Content.ReadAsStringAsync().Result;
+            string contentText = response.Content.ReadAsStringAsync().Result;
 
-            if(contentText.Contains("This video is unavailable"))
+            if (contentText.Contains("This video is unavailable") || contentText.Contains("Video unavailable") || contentText.Contains("An error occurred"))
                 return false;
 
             return true;
+        }
+
+        public void DeleteCustomExcersizes()
+        {
+            AnsiConsole.Markup("[green]Authenticating with Trainerize as Admin\n[/]");
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
+
+            AnsiConsole.Markup("[green]Retrieving custom excersizes from database\n[/]");
+            List<CustomExcersize> exercizeList = ReadCustomExcersizesImported();
+            AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
+
+            List<int?> excersizesIdsToDelete = new List<int?>();
+
+            foreach (CustomExcersize excersize in exercizeList)
+            {
+                excersizesIdsToDelete.Add(excersize.new_id);
+            }
+
+            AnsiConsole.Markup("[green]Deleting custom excersizes from trainerize\n[/]");
+            if (DeleteCustomExcersizesFromTrainerize(authDetails, excersizesIdsToDelete))
+            {
+                AnsiConsole.Markup("[green]Deletion successful\n[/]");
+                UpdateStoredDeletedCustomExcersizes(excersizesIdsToDelete);
+            }
+            else
+                AnsiConsole.Markup("[red]Deletion unsuccessful\n[/]");
+        }
+
+        private bool DeleteCustomExcersizesFromTrainerize(AuthenticationSession authDetails, List<int?> excersizesIdsToDelete)
+        {
+            DeleteCustomExcersizeRequest jsonBody = new DeleteCustomExcersizeRequest()
+            {
+                ids = excersizesIdsToDelete
+            };
+
+            var authenticator = new JwtAuthenticator(authDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.DeleteCustomExcersizeUrl();
+            request.Method = Method.Post;
+            request.AddJsonBody(jsonBody, ContentType.Json);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var queryResult = client.Execute(request);
+
+            DeleteCustomExcersizeResponse response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<DeleteCustomExcersizeResponse>(queryResult.Content);
+
+                foreach (DeletedExercise deletedExercise in response.exercises)
+                {
+                    if (!deletedExercise.deleted)
+                    {
+                        AnsiConsole.Markup("[red]Deletion of " + deletedExercise.id + " failed\n[/]");
+                        return false;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return false;
+            }
+
+            return true;
+        }
+
+        private void UpdateStoredDeletedCustomExcersizes(List<int?> excersizesIdsToDelete)
+        {
+            foreach(int? id in excersizesIdsToDelete)
+            {
+                CustomExcersize customExcersize = _context.Excerisize.FirstOrDefault(x => x.new_id == id);
+                customExcersize.new_id = null;
+                _context.Excerisize.Update(customExcersize);
+            }
+            _context.SaveChanges();
         }
 
         static ProgressColumn[] GetProgressColumns()
@@ -302,5 +397,7 @@ namespace TrainerizeMigrate.DataManagers
 
             return progressColumns.ToArray();
         }
+
+
     }
 }

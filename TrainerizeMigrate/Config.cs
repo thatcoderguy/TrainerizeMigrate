@@ -168,5 +168,15 @@ namespace TrainerizeMigrate
         {
             return _trainerizeurls.addworkoutplantophaseurl;
         }
+
+        public string DeleteCustomExcersizeUrl()
+        {
+            return _trainerizeurls.deletecustomexcersizeurl;
+        }
+
+        public string DeletePhaseUrl()
+        {
+            return _trainerizeurls.deletephaseurl;
+        }
     }
 }
