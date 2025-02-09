@@ -104,7 +104,7 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
 
-            BodyWeightResponse response = JsonSerializer.Deserialize<BodyWeightResponse>(queryResult.Content);
+            BodyWeightResponse? response = JsonSerializer.Deserialize<BodyWeightResponse>(queryResult.Content);
 
             return response;
         }
@@ -124,7 +124,7 @@ namespace TrainerizeMigrate.DataManagers
                 });
             }
 
-            BodyWeight bodyWeightRecord = _context.Body_Weight.FirstOrDefault();
+            BodyWeight? bodyWeightRecord = _context.Body_Weight.FirstOrDefault();
 
             if (bodyWeightRecord != null)
             {
@@ -184,7 +184,7 @@ namespace TrainerizeMigrate.DataManagers
 
         private bool UpdateBodyWeightPointToUpdated(int bodyWeightId, int newBodyStatsId)
         {
-            WeightPoint point = _context.Body_Weight_Point.FirstOrDefault(x => x.id == bodyWeightId);
+            WeightPoint? point = _context.Body_Weight_Point.FirstOrDefault(x => x.id == bodyWeightId);
             point.newbodystatid = newBodyStatsId;
 
             _context.Body_Weight_Point.Update(point);
@@ -216,12 +216,12 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
 
-            AddBodyStatResponse response = JsonSerializer.Deserialize<AddBodyStatResponse>(queryResult.Content);
+            AddBodyStatResponse? response = JsonSerializer.Deserialize<AddBodyStatResponse>(queryResult.Content);
 
             return response.bodyStatsID;
         }
 
-        private bool AddBodyStatsData(AuthenticationSession authDetails, int bodyStatsID, double bodyWeight, string date)
+        private bool AddBodyStatsData(AuthenticationSession authDetails, int bodyStatsID, double? bodyWeight, string date)
         {
             AddBodyStatDataRequest jsonBody = new AddBodyStatDataRequest() { 
                 date = date,
@@ -276,7 +276,7 @@ namespace TrainerizeMigrate.DataManagers
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             var queryResult = client.Execute(request);
             
-            AddBodyStatDataReponse response = JsonSerializer.Deserialize<AddBodyStatDataReponse>(queryResult.Content);
+            AddBodyStatDataReponse? response = JsonSerializer.Deserialize<AddBodyStatDataReponse>(queryResult.Content);
 
             if (response.code == 0)
                 return true;

@@ -9,5 +9,7 @@
   "gettrainingprogramphasesurl": "https://api.trainerize.com/v03/program/getUserProgramTrainingPlanList",
   "gettrainingphaseworkoutsurl": "https://api.trainerize.com/v03/trainingPlan/getWorkoutDefList",
   "getworkoutplandetailsurl": "https://api.trainerize.com/v03/workoutDef/get",
-  "addprogramphaseurl": "https://api.trainerize.com/v03/trainingPlan/add"
+  "addprogramphaseurl": "https://api.trainerize.com/v03/trainingPlan/add",
+  "getphaseworkoutplansurl": "https://api.trainerize.com/v03/trainingPlan/getWorkoutDefList",
+  "addworkoutplantophaseurl":  ""
 }

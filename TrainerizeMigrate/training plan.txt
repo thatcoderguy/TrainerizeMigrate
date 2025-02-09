@@ -1,4 +1,9 @@
 
+https://api.trainerize.com/v03/trainingPlan/delete
+{"planid":28547813,"closeGap":false}
+{"code":"0"}
+
+
 prog -> phase -> workout -> plan
 
 https://api.trainerize.com/v03/program/getUserProgramList

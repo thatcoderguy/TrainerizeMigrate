@@ -99,7 +99,7 @@ internal class Program
                     break;
 
                 case "[red]Export and Store Phased Workout Plans[/]":
-                    workoutManager.ExtractAndStoreWorkoutPlans();
+                    workoutManager.ExtractAndStoreWorkoutsForPhases();
                     break;
 
                 case "[red]Phased Workout Plans[/]":

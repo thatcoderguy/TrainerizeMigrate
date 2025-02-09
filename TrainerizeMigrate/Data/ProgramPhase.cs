@@ -20,5 +20,6 @@ namespace TrainerizeMigrate.Data
         public string planType { get; set; }
         public string modified { get; set; }
         public int? new_id { get; set; }
+        public bool workoutsimported { get; set; }
     }
 }

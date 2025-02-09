@@ -288,9 +288,95 @@ namespace TrainerizeMigrate.DataManagers
             return _context.TrainingProgramPhase.Where(x => x.new_id == null).ToList();
         }
 
-        public void ExtractAndStoreWorkouts()
+        public void ExtractAndStoreWorkoutsForPhases()
         {
+            AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithOriginalTrainerize(_config);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
+            AnsiConsole.Markup("[green]Reading all phases without imported workouts\n[/]");
+            List<ProgramPhase> phases = ReadAllPhasesWithoutImportedWorkouts();
+            AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
+
+            AnsiConsole.Markup("[green]Pulling workouts for phase from trainerize\n[/]");
+            List<PhaseWorkoutPlansResponse> phasedWorkouts = GetWorkoutsForPhases(authDetails, phases);
+            AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
+
+            AnsiConsole.Markup("[green]Storing training programs into database\n[/]");
+            //StorePhasedWorkouts(phasedWorkouts);
+            AnsiConsole.Markup("[green]Data storage successful\n[/]");
+        }
+        
+        private List<ProgramPhase> ReadAllPhasesWithoutImportedWorkouts()
+        {
+            return _context.TrainingProgramPhase.Where(x => x.new_id != null && x.workoutsimported == false).ToList();
+        }
+
+        private List<PhaseWorkoutPlansResponse> GetWorkoutsForPhases(AuthenticationSession authDetails,  List<ProgramPhase> phases)
+        {
+            List<PhaseWorkoutPlansResponse> phaseWorkoutPlansResponses = new List<PhaseWorkoutPlansResponse>();
+
+            AnsiConsole.Progress()
+                .Columns(GetProgressColumns())
+                .Start(async ctx =>
+                {
+                    var task = ctx.AddTask($"[green]Pulling phase workouts...[/]", autoStart: false);
+                    task.MaxValue = phases.Count;
+                    task.StartTask();
+
+                    foreach (ProgramPhase phase in phases)
+                    {
+                        PhaseWorkoutPlansResponse phaseWorkouts = PullPhaseWorkouts(authDetails, phase.id);
+
+                        phaseWorkoutPlansResponses.Add(phaseWorkouts);
+
+                        task.Increment(1);
+                    }
+                    task.StopTask();
+                });
+
+            return phaseWorkoutPlansResponses;
+        }
+
+        private PhaseWorkoutPlansResponse PullPhaseWorkouts(AuthenticationSession authDetails, int PhaseId)
+        {
+            PhaseWorkoutPlansRequest jsonBody = new PhaseWorkoutPlansRequest()
+            {
+                planID = PhaseId,
+                count = 100,
+                filter = new Filter() {  duration = null, equipments = null},
+                searchTerm = string.Empty,
+                sort = "name",
+                start = 0
+            };
+
+            var authenticator = new JwtAuthenticator(authDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.GetPhaseWorkoutPlansUrl();
+            request.Method = Method.Post;
+            request.AddJsonBody(jsonBody, ContentType.Json);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var queryResult = client.Execute(request);
+
+            PhaseWorkoutPlansResponse response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<PhaseWorkoutPlansResponse>(queryResult.Content);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+           
+
+            return response;
         }
 
         public void ImportWorkouts()

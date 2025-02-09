@@ -9,30 +9,32 @@ namespace TrainerizeMigrate
 {
     public class AuthenticationDetails
     {
-        public string original_username { get; set; }
-        public string original_password { get; set; }
-        public string original_groupname { get; set; }
-        public string new_username { get; set; }
-        public string new_password { get; set; }
-        public string new_groupname { get; set; }
-        public string new_trainer_username { get; set; }
-        public string new_trainer_password { get; set; }
-        public string new_trainer_groupname { get; set; }
+        public string? original_username { get; set; }
+        public string? original_password { get; set; }
+        public string? original_groupname { get; set; }
+        public string? new_username { get; set; }
+        public string? new_password { get; set; }
+        public string? new_groupname { get; set; }
+        public string? new_trainer_username { get; set; }
+        public string? new_trainer_password { get; set; }
+        public string? new_trainer_groupname { get; set; }
     }
 
     public class TrainerizeUrls
     {
-        public string loginurl { get; set; }
-        public string getbodystatsdataurl { get; set; }
-        public string addbodystatsurl { get; set; }
-        public string addbodystatsdataurl { get; set; }
-        public string performedexcersizesurl { get; set; }
-        public string addcustomexcersizeurl {  get; set; }
-        public string gettrainingprogramsurl { get; set; }
-        public string gettrainingprogramphasesurl { get; set; }
-        public string gettrainingphaseworkoutsurl { get; set; }
-        public string getworkoutplandetailsurl { get; set; }
-        public string addprogramphaseurl { get; set; }
+        public string? loginurl { get; set; }
+        public string? getbodystatsdataurl { get; set; }
+        public string? addbodystatsurl { get; set; }
+        public string? addbodystatsdataurl { get; set; }
+        public string? performedexcersizesurl { get; set; }
+        public string? addcustomexcersizeurl {  get; set; }
+        public string? gettrainingprogramsurl { get; set; }
+        public string? gettrainingprogramphasesurl { get; set; }
+        public string? gettrainingphaseworkoutsurl { get; set; }
+        public string? getworkoutplandetailsurl { get; set; }
+        public string? addprogramphaseurl { get; set; }
+        public string? getphaseworkoutplansurl { get; set; }
+        public string? addworkoutplantophaseurl { get; set; }
     }
 
     public class Config
@@ -153,6 +155,16 @@ namespace TrainerizeMigrate
         public string AddTrainingPhaseUrl()
         {
             return _trainerizeurls.addprogramphaseurl;
+        }
+
+        public string GetPhaseWorkoutPlansUrl()
+        {
+            return _trainerizeurls.getphaseworkoutplansurl;
+        }
+
+        public string AddWorkoutPlanToPhaseUrl()
+        {
+            return _trainerizeurls.addworkoutplantophaseurl;
         }
     }
 }
