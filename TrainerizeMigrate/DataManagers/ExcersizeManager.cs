@@ -50,8 +50,8 @@ namespace TrainerizeMigrate.DataManagers
 
         public bool ImportExtractedData()
         {
-            AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
-            AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
+            AnsiConsole.Markup("[green]Authenticating with Trainerize as admin\n[/]");
+            AuthenticationSession trainerDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
 
@@ -61,7 +61,7 @@ namespace TrainerizeMigrate.DataManagers
 
             if (excersizes.Count > 0)
             {
-                PushCustomExcersizes(authDetails, excersizes);
+                PushCustomExcersizes(trainerDetails, excersizes);
                 AnsiConsole.Markup("[green]Import sucessful\n[/]");
 
                 return true;
@@ -305,7 +305,7 @@ namespace TrainerizeMigrate.DataManagers
         public void DeleteCustomExcersizes()
         {
             AnsiConsole.Markup("[green]Authenticating with Trainerize as Admin\n[/]");
-            AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
+            AuthenticationSession trainerDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
             AnsiConsole.Markup("[green]Retrieving custom excersizes from database\n[/]");
@@ -314,19 +314,24 @@ namespace TrainerizeMigrate.DataManagers
 
             List<int?> excersizesIdsToDelete = new List<int?>();
 
-            foreach (CustomExcersize excersize in exercizeList)
+            if (exercizeList.Count > 0)
             {
-                excersizesIdsToDelete.Add(excersize.new_id);
-            }
+                foreach (CustomExcersize excersize in exercizeList)
+                {
+                    excersizesIdsToDelete.Add(excersize.new_id);
+                }
 
-            AnsiConsole.Markup("[green]Deleting custom excersizes from trainerize\n[/]");
-            if (DeleteCustomExcersizesFromTrainerize(authDetails, excersizesIdsToDelete))
-            {
-                AnsiConsole.Markup("[green]Deletion successful\n[/]");
-                UpdateStoredDeletedCustomExcersizes(excersizesIdsToDelete);
+                AnsiConsole.Markup("[green]Deleting custom excersizes from trainerize\n[/]");
+                if (DeleteCustomExcersizesFromTrainerize(trainerDetails, excersizesIdsToDelete))
+                {
+                    AnsiConsole.Markup("[green]Deletion successful\n[/]");
+                    UpdateStoredDeletedCustomExcersizes(excersizesIdsToDelete);
+                }
+                else
+                    AnsiConsole.Markup("[red]Deletion unsuccessful\n[/]");
             }
             else
-                AnsiConsole.Markup("[red]Deletion unsuccessful\n[/]");
+                AnsiConsole.Markup("[green]No excersizes to delete\n[/]");
         }
 
         private bool DeleteCustomExcersizesFromTrainerize(AuthenticationSession authDetails, List<int?> excersizesIdsToDelete)

@@ -103,7 +103,7 @@ internal class Program
                     break;
 
                 case "[red]Delete All Phases[/]":
-                    workoutManager.DeleteAllPhases();
+                    workoutManager.DeleteAllImportedPhases();
                     break;
 
                 case "[red]Export and Store Phased Workout Plans[/]":
@@ -140,7 +140,7 @@ internal class Program
             "[red]Delete Custom Excersizes[/]",
             "[red]Export and Store Phases[/]",
             "[red]Import Phases[/]",
-            "[red]Delete Phases[/]",
+            "[red]Delete All Phases[/]",
             "[red]Export and Store Phased Workout Plans[/]",
             "[red]Import Phased Workout Plans[/]",
             "[red]Export and Store Workout Session Data[/]",

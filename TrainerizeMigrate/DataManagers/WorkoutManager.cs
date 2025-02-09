@@ -81,7 +81,7 @@ namespace TrainerizeMigrate.DataManagers
 
         private bool StoreTrainingPrograms(TrainingProgramListResponse trainingPrograms)
         {
-            foreach(API.Program program in trainingPrograms.programs)
+            foreach (API.Program program in trainingPrograms.programs)
             {
                 TrainingProgram trainingProgram = new TrainingProgram()
                 {
@@ -160,7 +160,7 @@ namespace TrainerizeMigrate.DataManagers
 
         private bool StoreProgramPhases(ProgramPhasesResponse programPhases)
         {
-            foreach(Plan phase in programPhases.plans)
+            foreach (Plan phase in programPhases.plans)
             {
                 _context.TrainingProgramPhase.Add(new ProgramPhase()
                 {
@@ -172,7 +172,7 @@ namespace TrainerizeMigrate.DataManagers
                     planType = phase.planType,
                     startDate = phase.startDate,
                     durationType = phase.durationType,
-                    duration = phase.duration                   
+                    duration = phase.duration
                 });
 
                 _context.SaveChanges();
@@ -183,7 +183,7 @@ namespace TrainerizeMigrate.DataManagers
 
         public bool ImportTrainingProgramPhases()
         {
-            AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
+            AnsiConsole.Markup("[green]Authenticating with Trainerize as admin\n[/]");
             AuthenticationSession trainerAuthDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
@@ -220,7 +220,7 @@ namespace TrainerizeMigrate.DataManagers
                     {
                         AnsiConsole.Markup("[green]Adding Phase " + phase.name + "\n[/]");
                         int? newPhaseId = AddProgramPhase(authDetails, phase, clientID);
-                        if(newPhaseId is not null) 
+                        if (newPhaseId is not null)
                             UpdatePhase(phase.id, newPhaseId);
 
                         task.Increment(1);
@@ -265,6 +265,9 @@ namespace TrainerizeMigrate.DataManagers
             try
             {
                 response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
+                if (response.id == 0)
+                    return null;
+
             }
             catch (Exception ex)
             {
@@ -345,13 +348,13 @@ namespace TrainerizeMigrate.DataManagers
             //StorePhasedWorkouts(phasedWorkouts);
             AnsiConsole.Markup("[green]Data storage successful\n[/]");
         }
-        
+
         private List<ProgramPhase> ReadAllPhasesWithoutImportedWorkouts()
         {
             return _context.TrainingProgramPhase.Where(x => x.new_id != null && x.workoutsimported == false).ToList();
         }
 
-        private List<PhaseWorkoutPlansResponse> GetWorkoutsForPhases(AuthenticationSession authDetails,  List<ProgramPhase> phases)
+        private List<PhaseWorkoutPlansResponse> GetWorkoutsForPhases(AuthenticationSession authDetails, List<ProgramPhase> phases)
         {
             List<PhaseWorkoutPlansResponse> phaseWorkoutPlansResponses = new List<PhaseWorkoutPlansResponse>();
 
@@ -384,7 +387,7 @@ namespace TrainerizeMigrate.DataManagers
             {
                 planID = PhaseId,
                 count = 100,
-                filter = new Filter() {  duration = null, equipments = null},
+                filter = new Filter() { duration = null, equipments = null },
                 searchTerm = string.Empty,
                 sort = "name",
                 start = 0
@@ -415,7 +418,7 @@ namespace TrainerizeMigrate.DataManagers
                 AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
                 return null;
             }
-           
+
 
             return response;
         }
@@ -435,9 +438,103 @@ namespace TrainerizeMigrate.DataManagers
 
         }
 
-        internal void DeleteAllPhases()
+        public bool DeleteAllImportedPhases()
         {
-            throw new NotImplementedException();
+            AnsiConsole.Markup("[green]Authenticating with Trainerize as admin\n[/]");
+            AuthenticationSession trainerAuthDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
+
+            AnsiConsole.Markup("[green]Retreving imported program phases from database\n[/]");
+            List<ProgramPhase> phases = ReadAllImportedPhases();
+            AnsiConsole.Markup("[green]Data retrival successful\n[/]");
+
+            if (phases.Count > 0)
+            {
+                DeleteProgramPhases(trainerAuthDetails, phases);
+                AnsiConsole.Markup("[green]Deletion sucessful\n[/]");
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public List<ProgramPhase> ReadAllImportedPhases()
+        {
+            return _context.TrainingProgramPhase.Where(x => x.new_id != null).ToList();
+        }
+
+        private bool DeleteProgramPhases(AuthenticationSession trainerAuthDetails, List<ProgramPhase> phases)
+        {
+            AnsiConsole.Progress()
+                .Columns(GetProgressColumns())
+                .Start(async ctx =>
+                {
+                    var task = ctx.AddTask($"[green]Importing custom excersize data...[/]", autoStart: false);
+                    task.MaxValue = phases.Count;
+                    task.StartTask();
+
+                    foreach (ProgramPhase phase in phases)
+                    {
+                        AnsiConsole.Markup("[green]Deleteing Phase " + phase.name + "\n[/]");
+                        if(DeleteProgramPhaseFromTrainerize(trainerAuthDetails, phase.new_id))
+                            UpdateStoredTrainingPhase(phase.new_id);
+
+                        task.Increment(1);
+                    }
+                    task.StopTask();
+                });
+
+            return false;
+        }
+
+        private bool DeleteProgramPhaseFromTrainerize(AuthenticationSession trainerAuthDetails, int? newPhaseId)
+        {
+            DeletePhaseRequest jsonBody = new DeletePhaseRequest()
+            {
+                closeGap = false,
+                planid = newPhaseId
+            };
+
+            var authenticator = new JwtAuthenticator(trainerAuthDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.DeletePhaseUrl();
+            request.Method = Method.Post;
+            request.AddJsonBody(jsonBody, ContentType.Json);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var queryResult = client.Execute(request);
+
+            DeletePhaseResponse response = null;
+
+            try
+            {
+                response = JsonSerializer.Deserialize<DeletePhaseResponse>(queryResult.Content);
+                if (response.code != "0")
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return false;
+            }
+
+            return true;
+
+        }
+
+        private void UpdateStoredTrainingPhase(int? phaseId)
+        {
+
+            ProgramPhase programPhase = _context.TrainingProgramPhase.FirstOrDefault(x => x.new_id == phaseId);
+            programPhase.new_id = null;
+            _context.TrainingProgramPhase.Update(programPhase);
+            _context.SaveChanges();
         }
 
         static ProgressColumn[] GetProgressColumns()
