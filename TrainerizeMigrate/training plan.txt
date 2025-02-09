@@ -4,6 +4,15 @@ https://api.trainerize.com/v03/trainingPlan/delete
 {"code":"0"}
 
 
+--------------------------
+
+https://api.trainerize.com/v03/exercise/DeleteList
+{"ids":[15143832]}
+{"exercises":[{"id":15143832,"deleted":true}]}
+
+
+------------------------
+
 prog -> phase -> workout -> plan
 
 https://api.trainerize.com/v03/program/getUserProgramList

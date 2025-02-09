@@ -35,6 +35,8 @@ namespace TrainerizeMigrate
         public string? addprogramphaseurl { get; set; }
         public string? getphaseworkoutplansurl { get; set; }
         public string? addworkoutplantophaseurl { get; set; }
+        public string? deletephaseurl {  get; set; }
+        public string? deletecustomexcersizeurl { get; set; }
     }
 
     public class Config

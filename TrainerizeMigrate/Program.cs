@@ -80,6 +80,10 @@ internal class Program
                     excersizeManager.ImportExtractedData();
                     break;
 
+                case "[red]Delete Custom Excersizes[/]":
+                    excersizeManager.DeleteCustomExcersizes();
+                    break;
+
                 /*  NOT NEEDED AS TRAINERIZE ONLY ALLOWS 1 PROGRAM PER CLIENT
                 case "[red]Export and Store Programs[/]":
                     workoutManager.ExtractAndStoreTrainingPrograms();
@@ -98,11 +102,15 @@ internal class Program
                     workoutManager.ImportTrainingProgramPhases();
                     break;
 
+                case "[red]Delete All Phases[/]":
+                    workoutManager.DeleteAllPhases();
+                    break;
+
                 case "[red]Export and Store Phased Workout Plans[/]":
                     workoutManager.ExtractAndStoreWorkoutsForPhases();
                     break;
 
-                case "[red]Phased Workout Plans[/]":
+                case "[red]Import Phased Workout Plans[/]":
                     workoutManager.ImportWorkoutPlans();
                     break;
 
