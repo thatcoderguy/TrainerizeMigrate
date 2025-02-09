@@ -345,8 +345,19 @@ namespace TrainerizeMigrate.DataManagers
             AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
 
             AnsiConsole.Markup("[green]Storing training programs into database\n[/]");
-            //StorePhasedWorkouts(phasedWorkouts);
+            StorePhasedWorkouts(phasedWorkouts);
             AnsiConsole.Markup("[green]Data storage successful\n[/]");
+        }
+
+        private void StorePhasedWorkouts(List<PhaseWorkoutPlansResponse> phasedWorkouts)
+        {
+            foreach(PhaseWorkoutPlansResponse phaseWorkoutPlansResponse in phasedWorkouts)
+            {
+                //store workout
+
+                //loop through excersizes
+                    //store and link excersizes
+            }
         }
 
         private List<ProgramPhase> ReadAllPhasesWithoutImportedWorkouts()
@@ -423,19 +434,9 @@ namespace TrainerizeMigrate.DataManagers
             return response;
         }
 
-        public void ImportWorkouts()
-        {
-
-        }
-
-        public void ExtractAndStoreWorkoutPlans()
-        {
-
-        }
-
         public void ImportWorkoutPlans()
         {
-
+            throw new NotImplementedException();
         }
 
         public bool DeleteAllImportedPhases()
@@ -530,7 +531,6 @@ namespace TrainerizeMigrate.DataManagers
 
         private void UpdateStoredTrainingPhase(int? phaseId)
         {
-
             ProgramPhase programPhase = _context.TrainingProgramPhase.FirstOrDefault(x => x.new_id == phaseId);
             programPhase.new_id = null;
             _context.TrainingProgramPhase.Update(programPhase);
