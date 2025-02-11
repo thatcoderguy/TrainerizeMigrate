@@ -56,7 +56,7 @@ namespace TrainerizeMigrate.DataManagers
 
 
             AnsiConsole.Markup("[green]Retreving excersize data from database\n[/]");
-            List<Data.CustomExcersize> excersizes = ReadCustomExcersizesNotImported();
+            List<CustomExcersize> excersizes = ReadCustomExcersizesNotImported();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
 
             if (excersizes.Count > 0)
@@ -103,7 +103,6 @@ namespace TrainerizeMigrate.DataManagers
                 AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
                 return null;
             }
-
 
             return response;
         }
@@ -209,7 +208,6 @@ namespace TrainerizeMigrate.DataManagers
                     task.StopTask();
                 });
 
-
             return false;
         }
 
@@ -229,7 +227,6 @@ namespace TrainerizeMigrate.DataManagers
 
         private int? AddCustomExcersize(AuthenticationSession authDetails, CustomExcersize excersize)
         {
-
             if (excersize.videoType == "youtube")
                 if (!CheckYouTubeVideoExists(excersize.videoUrl))
                 {
@@ -296,7 +293,7 @@ namespace TrainerizeMigrate.DataManagers
 
             string contentText = response.Content.ReadAsStringAsync().Result;
 
-            if (contentText.Contains("This video is unavailable") || contentText.Contains("Video unavailable") || contentText.Contains("An error occurred"))
+            if (contentText.Contains("<meta name=\"robots\" content=\"noindex\">"))
                 return false;
 
             return true;

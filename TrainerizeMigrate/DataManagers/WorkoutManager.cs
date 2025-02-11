@@ -218,7 +218,7 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (ProgramPhase phase in phases)
                     {
-                        AnsiConsole.Markup("[green]Adding Phase " + phase.name + "\n[/]");
+                        //AnsiConsole.Markup("[green]Adding Phase " + phase.name + "\n[/]");
                         int? newPhaseId = AddProgramPhase(authDetails, phase, clientID);
                         if (newPhaseId is not null)
                             UpdatePhase(phase.id, newPhaseId);
@@ -340,34 +340,6 @@ namespace TrainerizeMigrate.DataManagers
             List<ProgramPhase> phases = ReadAllPhasesWithoutImportedWorkouts();
             AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
 
-            AnsiConsole.Markup("[green]Pulling workouts for phase from trainerize\n[/]");
-            List<PhaseWorkoutPlansResponse> phasedWorkouts = GetWorkoutsForPhases(authDetails, phases);
-            AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
-
-            AnsiConsole.Markup("[green]Storing training programs into database\n[/]");
-            StorePhasedWorkouts(phasedWorkouts);
-            AnsiConsole.Markup("[green]Data storage successful\n[/]");
-        }
-
-        private void StorePhasedWorkouts(List<PhaseWorkoutPlansResponse> phasedWorkouts)
-        {
-            foreach(PhaseWorkoutPlansResponse phaseWorkoutPlansResponse in phasedWorkouts)
-            {
-                //store workout
-
-                //loop through excersizes
-                    //store and link excersizes
-            }
-        }
-
-        private List<ProgramPhase> ReadAllPhasesWithoutImportedWorkouts()
-        {
-            return _context.TrainingProgramPhase.Where(x => x.new_id != null && x.workoutsimported == false).ToList();
-        }
-
-        private List<PhaseWorkoutPlansResponse> GetWorkoutsForPhases(AuthenticationSession authDetails, List<ProgramPhase> phases)
-        {
-            List<PhaseWorkoutPlansResponse> phaseWorkoutPlansResponses = new List<PhaseWorkoutPlansResponse>();
 
             AnsiConsole.Progress()
                 .Columns(GetProgressColumns())
@@ -382,14 +354,74 @@ namespace TrainerizeMigrate.DataManagers
                         AnsiConsole.Markup("[green]Pulling workouts for phase: " + phase.name + "\n[/]");
                         PhaseWorkoutPlansResponse phaseWorkouts = PullPhaseWorkouts(authDetails, phase.id);
 
-                        phaseWorkoutPlansResponses.Add(phaseWorkouts);
+                        AnsiConsole.Markup("[green]Storing training programs for phase into database\n[/]");
+                        if (phaseWorkouts.workouts.Count > 0)
+                            StorePhaseWorkouts(phaseWorkouts, phase.id);
+                        AnsiConsole.Markup("[green]Data storage successful\n[/]");
 
                         task.Increment(1);
                     }
                     task.StopTask();
-                });
 
-            return phaseWorkoutPlansResponses;
+                });
+        }
+
+        private void StorePhaseWorkouts(PhaseWorkoutPlansResponse phaseWorkouts, int phaseId)
+        {
+            ProgramPhase phase = _context.TrainingProgramPhase.FirstOrDefault(x => x.id == phaseId);
+
+            if (phase != null)
+            {
+                foreach (Workout workout in phaseWorkouts.workouts)
+                {
+                    PlanWorkout workoutPlan = new PlanWorkout()
+                    {
+                        id = workout.id,
+                        instruction = workout.instruction,
+                        name = workout.name,
+                        new_id = null,
+                        excersizes = new List<WorkoutExcersize>()
+                    };
+
+                    foreach (PhaseWorkoutPlanExercise exercise in workout.exercises)
+                    {
+                        //check if the excersize is a custom excersize
+                        CustomExcersize storedCustomExcersize = _context.Excerisize.FirstOrDefault(x => x.id == exercise.id);
+                        int? excersizeId = 0;
+
+                        //if it is, then link it to the excersize Id in the new trainerize
+                        if(storedCustomExcersize != null)
+                            excersizeId = storedCustomExcersize.new_id;
+                        else
+                            excersizeId = exercise.id;
+
+                        WorkoutExcersize workoutExcersize = new WorkoutExcersize()
+                        {
+                            id = excersizeId,
+                            restTime = exercise.restTime,
+                            sets = exercise.sets,
+                            superSetID = exercise.superSetID,
+                            target = exercise.target,
+                            targetDetailText = exercise.targetDetail is null ? null : exercise.targetDetail.text,
+                            targetDetailTime = exercise.targetDetail is null ? null : exercise.targetDetail.time,
+                            targetDetailType = exercise.targetDetail is null ? null : exercise.targetDetail.type,
+                            SystemId = new Guid()
+                        };
+
+                        workoutPlan.excersizes.Add(workoutExcersize);
+                        _context.WorkoutExcersize.Add(workoutExcersize);
+                    }
+
+                    _context.TrainingPlanWorkout.Add(workoutPlan);
+
+                    _context.SaveChanges();
+                }
+            }
+        }
+
+        private List<ProgramPhase> ReadAllPhasesWithoutImportedWorkouts()
+        {
+            return _context.TrainingProgramPhase.Where(x => x.new_id != null && x.workoutsimported == false).ToList();
         }
 
         private PhaseWorkoutPlansResponse PullPhaseWorkouts(AuthenticationSession authDetails, int PhaseId)

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrainerizeMigrate.Migrations;
 
@@ -10,9 +11,11 @@ using TrainerizeMigrate.Migrations;
 namespace TrainerizeMigrate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250211104205_updated workout fields to correcttype")]
+    partial class updatedworkoutfieldstocorrecttype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -261,7 +264,7 @@ namespace TrainerizeMigrate.Migrations
                     b.Property<double?>("targetDetailTime")
                         .HasColumnType("REAL");
 
-                    b.Property<int?>("targetDetailType")
+                    b.Property<int>("targetDetailType")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("SystemId");

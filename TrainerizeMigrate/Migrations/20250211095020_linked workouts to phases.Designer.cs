@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrainerizeMigrate.Migrations;
 
@@ -10,9 +11,11 @@ using TrainerizeMigrate.Migrations;
 namespace TrainerizeMigrate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250211095020_linked workouts to phases")]
+    partial class linkedworkoutstophases
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -240,28 +243,29 @@ namespace TrainerizeMigrate.Migrations
                     b.Property<int?>("PlanWorkoutid")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("id")
+                    b.Property<int>("id")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("restTime")
+                    b.Property<int>("restTime")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("sets")
+                    b.Property<int>("sets")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("superSetID")
+                    b.Property<int>("superSetID")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("target")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("targetDetailText")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("targetDetailText")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<double?>("targetDetailTime")
-                        .HasColumnType("REAL");
+                    b.Property<int>("targetDetailTime")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<int?>("targetDetailType")
+                    b.Property<int>("targetDetailType")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("SystemId");

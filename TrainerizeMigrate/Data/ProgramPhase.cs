@@ -21,5 +21,6 @@ namespace TrainerizeMigrate.Data
         public string modified { get; set; }
         public int? new_id { get; set; }
         public bool workoutsimported { get; set; }
+        public virtual List<PlanWorkout> workouts { get; set; }
     }
 }
