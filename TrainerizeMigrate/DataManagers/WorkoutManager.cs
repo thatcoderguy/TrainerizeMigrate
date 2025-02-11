@@ -441,6 +441,11 @@ namespace TrainerizeMigrate.DataManagers
             List<ProgramPhase> phases = ReadPhasesAndWorkoutsAndExcersizesNotImported();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
 
+            //TODO
+            //1. Work out why excersizes arent in correct order
+            //2. Refactor code
+            //3. Work out why count down doesnt get to max value
+
             AnsiConsole.Progress()
                 .Columns(GetProgressColumns())
                 .Start(async ctx =>
