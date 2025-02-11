@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrainerizeMigrate.Data
 {
@@ -18,6 +13,7 @@ namespace TrainerizeMigrate.Data
         public string? target { get; set; }
         public int? restTime { get; set; }
         public int? superSetID { get; set; }
+        public int? intervalTime { get; set; }
         public int? targetDetailType { get; set; }
         public double? targetDetailTime { get; set; }
         public string? targetDetailText { get; set; }

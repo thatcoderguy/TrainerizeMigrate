@@ -1,12 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-using TrainerizeMigrate.Migrations;
-using System;
-using System.Linq;
+﻿using TrainerizeMigrate.Migrations;
 using Microsoft.EntityFrameworkCore;
 using TrainerizeMigrate;
 using TrainerizeMigrate.DataManagers;
 using Spectre.Console;
-
 
 internal class Program
 {
@@ -111,7 +107,7 @@ internal class Program
                     break;
 
                 case "[red]Import Phased Workout Plans[/]":
-                    workoutManager.ImportWorkoutPlans();
+                    workoutManager.ImportWorkoutPlansForPhases();
                     break;
 
                 case "[red]Export and Store Workout Session Data[/]":

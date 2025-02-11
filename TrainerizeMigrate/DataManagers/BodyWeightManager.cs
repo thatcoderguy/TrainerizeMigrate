@@ -1,16 +1,10 @@
 ﻿using RestSharp.Authenticators;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using TrainerizeMigrate.API;
 using TrainerizeMigrate.Migrations;
 using TrainerizeMigrate.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Nodes;
 using Spectre.Console;
 
 namespace TrainerizeMigrate.DataManagers
@@ -100,21 +94,13 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.GetBodyStatsDataUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            BodyWeightResponse? response = null;
+            BodyWeightResponse? response = JsonSerializer.Deserialize<BodyWeightResponse>(queryResult.Content);
 
-            try
-            {
-                response = JsonSerializer.Deserialize<BodyWeightResponse>(queryResult.Content);
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+            if (response.points == null || response.points.Count == 0)
                 return null;
-            }
 
             return response;
         }
@@ -157,7 +143,7 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
-        private BodyWeight ReadBodyWeightData()
+        private BodyWeight? ReadBodyWeightData()
         {
             return _context.Body_Weight.Include(x => x.points.Where(y => y.newbodystatid == null)).FirstOrDefault();
         }
@@ -224,22 +210,13 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.AddBodyStatUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            AddBodyStatResponse? response = null;
+            AddBodyStatResponse? response = JsonSerializer.Deserialize<AddBodyStatResponse>(queryResult.Content);
 
-            try
-            {
-                response = JsonSerializer.Deserialize<AddBodyStatResponse>(queryResult.Content);
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+            if (response.bodyStatsID == null || response.bodyStatsID == 0)
                 return null;
-            }
-
 
             return response.bodyStatsID;
         }
@@ -295,23 +272,12 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.AddBodyStatDataUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            AddBodyStatDataReponse? response = null;
+            AddBodyStatDataReponse? response  = JsonSerializer.Deserialize<AddBodyStatDataReponse>(queryResult.Content);
 
-            try
-            {
-                response = JsonSerializer.Deserialize<AddBodyStatDataReponse>(queryResult.Content);
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
-                return false;
-            }
-
-            if (response.code == 0)
+            if (response.code != null && response.code == 0)
                 return true;
 
             return false;

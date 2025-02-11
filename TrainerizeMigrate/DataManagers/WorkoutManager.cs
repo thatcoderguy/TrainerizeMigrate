@@ -1,17 +1,12 @@
 ﻿using RestSharp.Authenticators;
 using RestSharp;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using TrainerizeMigrate.API;
 using TrainerizeMigrate.Migrations;
 using TrainerizeMigrate.Data;
-using System.Linq.Expressions;
-using System.Text.Json.Nodes;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -60,15 +55,14 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.GetTrainingProgramsUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
             TrainingProgramListResponse response = null;
 
             try
             {
-                response = JsonSerializer.Deserialize<TrainingProgramListResponse>(queryResult.Content);
+                response = JsonConvert.DeserializeObject<TrainingProgramListResponse>(queryResult.Content);
             }
             catch (Exception ex)
             {
@@ -139,21 +133,13 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.GetTrainingProgramPhasesUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            ProgramPhasesResponse response = null;
+            ProgramPhasesResponse response  = JsonConvert.DeserializeObject<ProgramPhasesResponse>(queryResult.Content);
 
-            try
-            {
-                response = JsonSerializer.Deserialize<ProgramPhasesResponse>(queryResult.Content);
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+            if (response.plans == null || response.plans.Count == 0)
                 return null;
-            }
 
             return response;
         }
@@ -256,24 +242,13 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.AddTrainingPhaseUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             RestResponse queryResult = client.Execute(request);
 
-            AddCustomExcersizeResponse response = null;
-
-            try
-            {
-                response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
-                if (response.id == 0)
-                    return null;
-
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+            AddCustomExcersizeResponse response = JsonConvert.DeserializeObject<AddCustomExcersizeResponse>(queryResult.Content);
+            
+            if (response.id == 0)
                 return null;
-            }
 
             return response.id;
         }
@@ -304,21 +279,13 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.GetTrainingProgramsUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-            var queryResult = client.Execute(request);
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+             var queryResult = client.Execute(request);
 
-            TrainingProgramListResponse response = null;
+            TrainingProgramListResponse response = JsonConvert.DeserializeObject<TrainingProgramListResponse>(queryResult.Content);
 
-            try
-            {
-                response = JsonSerializer.Deserialize<TrainingProgramListResponse>(queryResult.Content);
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+            if (response.programs == null || response.programs.Count == 0)
                 return null;
-            }
 
             int programID = response.programs[0].id;
 
@@ -339,7 +306,6 @@ namespace TrainerizeMigrate.DataManagers
             AnsiConsole.Markup("[green]Reading all phases without imported workouts\n[/]");
             List<ProgramPhase> phases = ReadAllPhasesWithoutImportedWorkouts();
             AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
-
 
             AnsiConsole.Progress()
                 .Columns(GetProgressColumns())
@@ -368,7 +334,10 @@ namespace TrainerizeMigrate.DataManagers
 
         private void StorePhaseWorkouts(PhaseWorkoutPlansResponse phaseWorkouts, int phaseId)
         {
-            ProgramPhase phase = _context.TrainingProgramPhase.FirstOrDefault(x => x.id == phaseId);
+            ProgramPhase phase = _context.TrainingProgramPhase.Include(x => x.workouts).FirstOrDefault(x => x.id == phaseId);
+
+            if (phase.workouts == null)
+                phase.workouts = new List<PlanWorkout>();
 
             if (phase != null)
             {
@@ -380,6 +349,7 @@ namespace TrainerizeMigrate.DataManagers
                         instruction = workout.instruction,
                         name = workout.name,
                         new_id = null,
+                        type = workout.type,
                         excersizes = new List<WorkoutExcersize>()
                     };
 
@@ -414,6 +384,9 @@ namespace TrainerizeMigrate.DataManagers
 
                     _context.TrainingPlanWorkout.Add(workoutPlan);
 
+                    phase.workouts.Add(workoutPlan);
+                    _context.TrainingProgramPhase.Update(phase);
+
                     _context.SaveChanges();
                 }
             }
@@ -446,29 +419,129 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.GetPhaseWorkoutPlansUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            PhaseWorkoutPlansResponse response = null;
-
-            try
-            {
-                response = JsonSerializer.Deserialize<PhaseWorkoutPlansResponse>(queryResult.Content);
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
-                return null;
-            }
-
+            PhaseWorkoutPlansResponse response = JsonConvert.DeserializeObject<PhaseWorkoutPlansResponse>(queryResult.Content);
 
             return response;
         }
 
-        public void ImportWorkoutPlans()
+        public void ImportWorkoutPlansForPhases()
         {
-            throw new NotImplementedException();
+            AnsiConsole.Markup("[green]Authenticating with Trainerize as admin\n[/]");
+            AuthenticationSession trainerAuthDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
+
+            AnsiConsole.Markup("[green]Authenticating with Trainerize to get Client Id\n[/]");
+            AuthenticationSession clientAuthDetails = Authenticate.AuthenticateWithNewTrainerize(_config);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
+
+            AnsiConsole.Markup("[green]Retreving workout plans from database\n[/]");
+            List<ProgramPhase> phases = ReadPhasesAndWorkoutsAndExcersizesNotImported();
+            AnsiConsole.Markup("[green]Data retrival successful\n[/]");
+
+            AnsiConsole.Progress()
+                .Columns(GetProgressColumns())
+                .Start(async ctx =>
+                {
+                    var task = ctx.AddTask($"[green]Importing phase workouts...[/]", autoStart: false);
+                    task.MaxValue = phases.Count;
+                    task.StartTask();
+
+                    foreach (ProgramPhase phase in phases)
+                    {
+                        AddWorkoutRequest jsonBody = new AddWorkoutRequest()
+                        {
+                            trainingPlanID = phase.new_id,
+                            userID = clientAuthDetails.userId,
+                            workoutDef = new WorkoutDef(),
+                            type = "trainingPlan"
+                        };
+
+                        task.MaxValue = task.MaxValue + phase.workouts.Count;
+
+                        foreach(PlanWorkout workout in phase.workouts)
+                        {
+                            WorkoutDef workoutDet = new WorkoutDef()
+                            {
+                                exercises = new List<AddWorkoutxercise>(),
+                                instructions = workout.instruction,
+                                name = workout.name,
+                                rounds = 1,
+                                type = workout.type,
+                                tags = new List<string>(),
+                                trackingStats = new TrackingStats()
+                                {
+                                    def = new WrapperDef()
+                                    { 
+                                        def = new TrackingDef()
+                                        {
+                                            avgHeartRate = false,
+                                            effortInterval = false,
+                                            restInterval = false,
+                                            maxHeartRate = false,
+                                            minHeartRate = false,
+                                            zone = false
+                                        }
+                                    }
+                                }
+                            };
+
+                            List<AddWorkoutxercise> excersizes = new List<AddWorkoutxercise>();
+
+                            foreach (WorkoutExcersize excersize in workout.excersizes)
+                            {
+                                excersizes.Add(new AddWorkoutxercise()
+                                {
+                                    def = new ExcersizeDef()
+                                    {
+                                        id = excersize.id,
+                                        intervalTime = excersize.intervalTime,
+                                        restTime = excersize.restTime,
+                                        sets = excersize.sets,
+                                        superSetID = excersize.superSetID,
+                                        supersetType = excersize.superSetID > 0 ? "superset" : null,
+                                        target = excersize.target,
+                                        targetDetail = new AddWorkoutTargetDetail()
+                                        {
+                                            text = excersize.targetDetailText,
+                                            time = excersize.targetDetailTime,
+                                            type = excersize.targetDetailType
+                                        }
+                                    }
+                                });
+                            }
+
+                            workoutDet.exercises = excersizes;
+                            jsonBody.workoutDef = workoutDet;
+
+                            var authenticator = new JwtAuthenticator(trainerAuthDetails.token);
+                            var options = new RestClientOptions()
+                            {
+                                Authenticator = authenticator,
+                                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+                            };
+                            RestClient client = new RestClient(options);
+                            var request = new RestRequest();
+                            request.Resource = _config.AddWorkoutPlanToPhaseUrl();
+                            request.Method = Method.Post;
+                            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+                            var queryResult = client.Execute(request);
+
+                            AddWorkoutResponse response = JsonConvert.DeserializeObject<AddWorkoutResponse>(queryResult.Content);
+
+                            task.Increment(1);
+                        }                        
+                    }
+
+                    task.StopTask();
+                });
+        }
+
+        private List<ProgramPhase> ReadPhasesAndWorkoutsAndExcersizesNotImported()
+        {
+            return _context.TrainingProgramPhase.Include(x => x.workouts).ThenInclude(x => x.excersizes).Where(x => !x.workoutsimported && x.new_id != null).ToList();
         }
 
         public bool DeleteAllImportedPhases()
@@ -539,23 +612,13 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.DeletePhaseUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            DeletePhaseResponse response = null;
+            DeletePhaseResponse response = JsonConvert.DeserializeObject<DeletePhaseResponse>(queryResult.Content);
 
-            try
-            {
-                response = JsonSerializer.Deserialize<DeletePhaseResponse>(queryResult.Content);
-                if (response.code != "0")
-                    return false;
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+            if (response.code != "0")
                 return false;
-            }
 
             return true;
 
@@ -580,7 +643,5 @@ namespace TrainerizeMigrate.DataManagers
 
             return progressColumns.ToArray();
         }
-
-
     }
 }

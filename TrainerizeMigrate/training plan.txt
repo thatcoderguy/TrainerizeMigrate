@@ -33,7 +33,6 @@ https://api.trainerize.com/v03/workoutDef/add
 
 
 
-
 {"workoutID":173612871}
 
 

@@ -1,10 +1,5 @@
 ﻿using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using TrainerizeMigrate.API;
 
 namespace TrainerizeMigrate
@@ -25,11 +20,10 @@ namespace TrainerizeMigrate
             var request = new RestRequest();
             request.Resource = config.LoginUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-            var queryResult = client.Execute(request);
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+            RestResponse? queryResult = client.Execute(request);
 
-            TrainerizeLoginResponse response = JsonSerializer.Deserialize<TrainerizeLoginResponse>(queryResult.Content);
+            TrainerizeLoginResponse? response = JsonSerializer.Deserialize<TrainerizeLoginResponse>(queryResult.Content);
 
             if (response.code == 1)
                 return new AuthenticationSession()
@@ -55,11 +49,10 @@ namespace TrainerizeMigrate
             var request = new RestRequest();
             request.Resource = config.LoginUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            TrainerizeLoginResponse response = JsonSerializer.Deserialize<TrainerizeLoginResponse>(queryResult.Content);
+            TrainerizeLoginResponse? response = JsonSerializer.Deserialize<TrainerizeLoginResponse>(queryResult.Content);
 
             if (response.code == 1)
                 return new AuthenticationSession()
@@ -85,11 +78,10 @@ namespace TrainerizeMigrate
             var request = new RestRequest();
             request.Resource = config.LoginUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            TrainerizeLoginResponse response = JsonSerializer.Deserialize<TrainerizeLoginResponse>(queryResult.Content);
+            TrainerizeLoginResponse? response = JsonSerializer.Deserialize<TrainerizeLoginResponse>(queryResult.Content);
 
             if (response.code == 1)
                 return new AuthenticationSession()

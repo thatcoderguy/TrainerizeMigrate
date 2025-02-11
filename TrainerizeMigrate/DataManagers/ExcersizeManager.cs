@@ -1,20 +1,11 @@
 ﻿using RestSharp.Authenticators;
 using RestSharp;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TrainerizeMigrate.API;
 using TrainerizeMigrate.Data;
 using TrainerizeMigrate.Migrations;
 using System.Text.Json;
-using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Net;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -54,7 +45,6 @@ namespace TrainerizeMigrate.DataManagers
             AuthenticationSession trainerDetails = Authenticate.AuthenticateWithNewTrainerizeAsAdmin(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
-
             AnsiConsole.Markup("[green]Retreving excersize data from database\n[/]");
             List<CustomExcersize> excersizes = ReadCustomExcersizesNotImported();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
@@ -88,21 +78,13 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.GetPerformedExcersizesUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            ExcersizeListResponse response = null;
+            ExcersizeListResponse response =  JsonSerializer.Deserialize<ExcersizeListResponse>(queryResult.Content); ;
 
-            try
-            {
-                response = JsonSerializer.Deserialize<ExcersizeListResponse>(queryResult.Content); ;
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+            if (response.exercises == null)
                 return null;
-            }
 
             return response;
         }
@@ -265,23 +247,13 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.AddCustomExcersizeUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             RestResponse queryResult = queryResult = client.Execute(request);
 
-            AddCustomExcersizeResponse response = null;
+            AddCustomExcersizeResponse response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
 
-            try
-            {
-                response = JsonSerializer.Deserialize<AddCustomExcersizeResponse>(queryResult.Content);
-                if (response.id == 0)
-                    return null;
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+            if (response.id == 0)
                 return null;
-            }
 
             return response.id;
         }
@@ -348,8 +320,7 @@ namespace TrainerizeMigrate.DataManagers
             var request = new RestRequest();
             request.Resource = _config.DeleteCustomExcersizeUrl();
             request.Method = Method.Post;
-            request.AddJsonBody(jsonBody, ContentType.Json);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
             DeleteCustomExcersizeResponse response = null;

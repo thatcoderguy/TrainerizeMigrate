@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TrainerizeMigrate.Data
 {
@@ -14,6 +8,7 @@ namespace TrainerizeMigrate.Data
         public int id { get; set; }
         public string name { get; set; }
         public string instruction { get; set; }
+        public string type { get; set; }
         public virtual List<WorkoutExcersize> excersizes { get; set; }
         public int? new_id { get; set; }
     }
