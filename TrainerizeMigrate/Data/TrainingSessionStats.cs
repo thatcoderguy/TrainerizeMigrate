@@ -22,5 +22,6 @@ namespace TrainerizeMigrate.Data
         public double? calories { get; set; }
         public double? level { get; set; }
         public double? speed { get; set; }
+        public long? newdailyExerciseID { get; set; }
     }
 }

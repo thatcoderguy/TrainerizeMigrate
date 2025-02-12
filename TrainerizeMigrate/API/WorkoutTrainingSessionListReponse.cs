@@ -8,7 +8,7 @@
 
     public class WorkoutList
     {
-        public int? dailyWorkoutId { get; set; }
+        public int dailyWorkoutId { get; set; }
         public int? workoutId { get; set; }
         public string? workout { get; set; }
         public string? date { get; set; }

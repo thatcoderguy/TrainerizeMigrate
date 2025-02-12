@@ -110,7 +110,12 @@ internal class Program
                     workoutManager.ImportWorkoutPlansForPhases();
                     break;
 
-                case "[red]Export and Store Workout Session Data[/]":
+                case "[red]Export and Store Workout Sessions[/]":
+                    trainingSessionManager.ExtractAndStoreTrainingSessions();
+                    break;
+
+                case "[red]Export and Store Workout Session Stats[/]":
+                    trainingSessionManager.ExtractAndStoreTrainingSessionStats();
                     break;
 
                 case "[red]Import Workout Session Data[/]":
@@ -139,11 +144,11 @@ internal class Program
             "[red]Delete All Phases[/]",
             "[red]Export and Store Phased Workout Plans[/]",
             "[red]Import Phased Workout Plans[/]",
-            "[red]Export and Store Workout Session Data[/]",
+            "[red]Export and Store Workout Sessions[/]",
+            "[red]Export and Store Workout Session Stats[/]",
             "[red]Import Workout Session Data[/]",
             "[red]Exit[/]"
         };
 
     }
 }
-

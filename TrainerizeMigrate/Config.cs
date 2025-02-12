@@ -32,6 +32,8 @@ namespace TrainerizeMigrate
         public string? addworkoutplantophaseurl { get; set; }
         public string? deletephaseurl {  get; set; }
         public string? deletecustomexcersizeurl { get; set; }
+        public string? gettrainingsessionworkoutlisturl { get; set; }
+        public string? gettrainingsessionstatsurl { get; set; }
     }
 
     public class Config
@@ -172,6 +174,15 @@ namespace TrainerizeMigrate
         public string DeletePhaseUrl()
         {
             return _trainerizeurls.deletephaseurl;
+        }
+
+        public string GetTrainingSessionWorkoutListUrl()
+        {
+            return _trainerizeurls.gettrainingsessionworkoutlisturl;
+        }
+        public string GetTrainingSessionStatsUrl()
+        {
+            return _trainerizeurls.gettrainingsessionstatsurl;
         }
     }
 }

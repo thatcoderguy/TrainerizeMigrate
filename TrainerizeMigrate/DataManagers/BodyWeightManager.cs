@@ -76,7 +76,6 @@ namespace TrainerizeMigrate.DataManagers
         {
             BodyWeightRequest jsonBody = new BodyWeightRequest()
             {
-                //"2025-02-28"
                 startDate = GetLastRetreivedBodyWeightEntry(),
                 endDate = DateTime.Now.ToString("yyyy-MM-dd"),
                 type = "bodyweight",
