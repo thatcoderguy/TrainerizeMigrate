@@ -8,6 +8,8 @@ using TrainerizeMigrate.Data;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
+using System.Numerics;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -460,45 +462,58 @@ namespace TrainerizeMigrate.DataManagers
                     {
                         AnsiConsole.Markup("[green]Importing phase: " + phase.name + "\n[/]");
 
-                        AddWorkoutRequest jsonBody = new AddWorkoutRequest()
-                        {
-                            trainingPlanID = phase.new_id,
-                            userID = clientAuthDetails.userId,
-                            workoutDef = new WorkoutDef(),
-                            type = "trainingPlan"
-                        };
-
                         task.MaxValue = task.MaxValue + phase.workouts.Count;
 
-                        foreach(PlanWorkout workout in phase.workouts)
+                        foreach (PlanWorkout workout in phase.workouts)
                         {
-                            AnsiConsole.Markup("[green]Importing workout: " + workout.name + "\n[/]");
+                            int? newWorkoutId = PushWorkoutForPhase(trainerAuthDetails, clientAuthDetails.userId, phase, workout);
 
-                            jsonBody.workoutDef = BuildWorkoutRequest(workout);
-
-                            var authenticator = new JwtAuthenticator(trainerAuthDetails.token);
-                            var options = new RestClientOptions()
-                            {
-                                Authenticator = authenticator,
-                                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
-                            };
-                            RestClient client = new RestClient(options);
-                            var request = new RestRequest();
-                            request.Resource = _config.AddWorkoutPlanToPhaseUrl();
-                            request.Method = Method.Post;
-                            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
-                            var queryResult = client.Execute(request);
-
-                            AddWorkoutResponse response = JsonConvert.DeserializeObject<AddWorkoutResponse>(queryResult.Content);
+                            if (newWorkoutId != null)
+                                SetWorkoutAsImported(workout.id, newWorkoutId);
 
                             task.Increment(1);
+
                         }
+
+                        SetPhaseAsImported(phase.new_id);
 
                         task.Increment(1);
                     }
 
                     task.StopTask();
                 });
+        }
+
+        private int? PushWorkoutForPhase(AuthenticationSession trainerAuthDetails, int clientId, ProgramPhase phase, PlanWorkout workout)
+        {
+            AnsiConsole.Markup("[green]Importing workout: " + workout.name + "\n[/]");
+
+            AddWorkoutRequest jsonBody = new AddWorkoutRequest()
+            {
+                trainingPlanID = phase.new_id,
+                userID = clientId,
+                workoutDef = new WorkoutDef(),
+                type = "trainingPlan"
+            };
+
+            jsonBody.workoutDef = BuildWorkoutRequest(workout);
+
+            var authenticator = new JwtAuthenticator(trainerAuthDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.AddWorkoutPlanToPhaseUrl();
+            request.Method = Method.Post;
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+            var queryResult = client.Execute(request);
+
+            AddWorkoutResponse response = JsonConvert.DeserializeObject<AddWorkoutResponse>(queryResult.Content);
+
+            return response.workoutID;
         }
 
         private WorkoutDef BuildWorkoutRequest(PlanWorkout workout) 
@@ -561,6 +576,26 @@ namespace TrainerizeMigrate.DataManagers
             }
 
             return excersizes;
+        }
+
+        private bool SetWorkoutAsImported(int? workoutId, int? newWorkoutId)
+        {
+            PlanWorkout workout = _context.TrainingPlanWorkout.FirstOrDefault(x => x.id == workoutId);
+            workout.new_id = newWorkoutId;
+            _context.TrainingPlanWorkout.Update(workout);
+            _context.SaveChanges(true);
+
+            return true;
+        }
+
+        private bool SetPhaseAsImported(int? phaseId)
+        {
+            ProgramPhase phase = _context.TrainingProgramPhase.FirstOrDefault(x => x.new_id  == phaseId);
+            phase.workoutsimported = true;
+            _context.TrainingProgramPhase.Update(phase);
+            _context.SaveChanges(true);
+
+            return true;
         }
 
         private List<ProgramPhase> ReadPhasesAndWorkoutsAndExcersizesNotImported()
