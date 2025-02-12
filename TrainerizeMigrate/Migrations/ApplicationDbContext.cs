@@ -20,6 +20,8 @@ namespace TrainerizeMigrate.Migrations
         public virtual DbSet<ProgramPhase> TrainingProgramPhase { get; set; }
         public virtual DbSet<PlanWorkout> TrainingPlanWorkout { get; set; }
         public virtual DbSet<WorkoutExcersize> WorkoutExcersize { get; set; }
+        public virtual DbSet<TrainingSessionWorkout> TrainingSessionWorkout { get; set; }
+        public virtual DbSet<TrainingSessionStat> TrainingSessionStat { get; set; }
 
 
         public string DbPath { get; }
