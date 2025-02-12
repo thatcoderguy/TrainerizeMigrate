@@ -7,6 +7,7 @@ using TrainerizeMigrate.Migrations;
 using TrainerizeMigrate.Data;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -353,6 +354,8 @@ namespace TrainerizeMigrate.DataManagers
                         excersizes = new List<WorkoutExcersize>()
                     };
 
+                    int order = 0;
+
                     foreach (PhaseWorkoutPlanExercise exercise in workout.exercises)
                     {
                         //check if the excersize is a custom excersize
@@ -375,8 +378,12 @@ namespace TrainerizeMigrate.DataManagers
                             targetDetailText = exercise.targetDetail is null ? null : exercise.targetDetail.text,
                             targetDetailTime = exercise.targetDetail is null ? null : exercise.targetDetail.time,
                             targetDetailType = exercise.targetDetail is null ? null : exercise.targetDetail.type,
-                            SystemId = new Guid()
+                            SystemId = new Guid(),
+                            intervalTime = exercise.intervalTime,
+                            order = order
                         };
+
+                        order++;
 
                         workoutPlan.excersizes.Add(workoutExcersize);
                         _context.WorkoutExcersize.Add(workoutExcersize);
@@ -441,11 +448,6 @@ namespace TrainerizeMigrate.DataManagers
             List<ProgramPhase> phases = ReadPhasesAndWorkoutsAndExcersizesNotImported();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
 
-            //TODO
-            //1. Work out why excersizes arent in correct order
-            //2. Refactor code
-            //3. Work out why count down doesnt get to max value
-
             AnsiConsole.Progress()
                 .Columns(GetProgressColumns())
                 .Start(async ctx =>
@@ -456,6 +458,8 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (ProgramPhase phase in phases)
                     {
+                        AnsiConsole.Markup("[green]Importing phase: " + phase.name + "\n[/]");
+
                         AddWorkoutRequest jsonBody = new AddWorkoutRequest()
                         {
                             trainingPlanID = phase.new_id,
@@ -468,58 +472,9 @@ namespace TrainerizeMigrate.DataManagers
 
                         foreach(PlanWorkout workout in phase.workouts)
                         {
-                            WorkoutDef workoutDet = new WorkoutDef()
-                            {
-                                exercises = new List<AddWorkoutxercise>(),
-                                instructions = workout.instruction,
-                                name = workout.name,
-                                rounds = 1,
-                                type = workout.type,
-                                tags = new List<string>(),
-                                trackingStats = new TrackingStats()
-                                {
-                                    def = new WrapperDef()
-                                    { 
-                                        def = new TrackingDef()
-                                        {
-                                            avgHeartRate = false,
-                                            effortInterval = false,
-                                            restInterval = false,
-                                            maxHeartRate = false,
-                                            minHeartRate = false,
-                                            zone = false
-                                        }
-                                    }
-                                }
-                            };
+                            AnsiConsole.Markup("[green]Importing workout: " + workout.name + "\n[/]");
 
-                            List<AddWorkoutxercise> excersizes = new List<AddWorkoutxercise>();
-
-                            foreach (WorkoutExcersize excersize in workout.excersizes)
-                            {
-                                excersizes.Add(new AddWorkoutxercise()
-                                {
-                                    def = new ExcersizeDef()
-                                    {
-                                        id = excersize.id,
-                                        intervalTime = excersize.intervalTime,
-                                        restTime = excersize.restTime,
-                                        sets = excersize.sets,
-                                        superSetID = excersize.superSetID,
-                                        supersetType = excersize.superSetID > 0 ? "superset" : null,
-                                        target = excersize.target,
-                                        targetDetail = new AddWorkoutTargetDetail()
-                                        {
-                                            text = excersize.targetDetailText,
-                                            time = excersize.targetDetailTime,
-                                            type = excersize.targetDetailType
-                                        }
-                                    }
-                                });
-                            }
-
-                            workoutDet.exercises = excersizes;
-                            jsonBody.workoutDef = workoutDet;
+                            jsonBody.workoutDef = BuildWorkoutRequest(workout);
 
                             var authenticator = new JwtAuthenticator(trainerAuthDetails.token);
                             var options = new RestClientOptions()
@@ -537,11 +492,75 @@ namespace TrainerizeMigrate.DataManagers
                             AddWorkoutResponse response = JsonConvert.DeserializeObject<AddWorkoutResponse>(queryResult.Content);
 
                             task.Increment(1);
-                        }                        
+                        }
+
+                        task.Increment(1);
                     }
 
                     task.StopTask();
                 });
+        }
+
+        private WorkoutDef BuildWorkoutRequest(PlanWorkout workout) 
+        {
+            WorkoutDef workoutDet = new WorkoutDef()
+            {
+                exercises = new List<AddWorkoutxercise>(),
+                instructions = workout.instruction,
+                name = workout.name,
+                rounds = 1,
+                type = workout.type,
+                tags = new List<string>(),
+                trackingStats = new TrackingStats()
+                {
+                    def = new WrapperDef()
+                    {
+                        def = new TrackingDef()
+                        {
+                            avgHeartRate = false,
+                            effortInterval = false,
+                            restInterval = false,
+                            maxHeartRate = false,
+                            minHeartRate = false,
+                            zone = false
+                        }
+                    }
+                }
+            };
+
+            workoutDet.exercises = BuildWorkoutExcersizes(workout);
+
+            return workoutDet;
+        }
+
+        private List<AddWorkoutxercise> BuildWorkoutExcersizes(PlanWorkout workout)
+        {
+            List<AddWorkoutxercise> excersizes = new List<AddWorkoutxercise>();
+
+            foreach (WorkoutExcersize excersize in workout.excersizes.OrderBy(x => x.order))
+            {
+                excersizes.Add(new AddWorkoutxercise()
+                {
+                    def = new ExcersizeDef()
+                    {
+                        id = excersize.id,
+                        intervalTime = excersize.intervalTime,
+                        restTime = excersize.restTime,
+                        sets = excersize.sets,
+                        superSetID = excersize.superSetID,
+                        supersetType = excersize.superSetID > 0 ? "superset" : null,
+                        target = excersize.target,
+                        targetDetail = new AddWorkoutTargetDetail()
+                        {
+                            text = excersize.targetDetailText,
+                            time = excersize.targetDetailTime,
+                            type = excersize.targetDetailType
+                        }
+                    }
+                });
+            }
+
+            return excersizes;
         }
 
         private List<ProgramPhase> ReadPhasesAndWorkoutsAndExcersizesNotImported()
