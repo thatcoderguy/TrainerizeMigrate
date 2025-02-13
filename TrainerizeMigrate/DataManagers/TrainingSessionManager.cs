@@ -121,8 +121,6 @@ namespace TrainerizeMigrate.DataManagers
             List<TrainingSessionWorkout> trainingSessionWorkouts = ReadTrainingSessionsNotImported();
             AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
 
-            //PullTrainingSessionStatsFromTrainerize(trainingSessionWorkouts)
-
             AnsiConsole.Progress()
                 .Columns(GetProgressColumns())
                 .Start(async ctx =>
@@ -138,7 +136,7 @@ namespace TrainerizeMigrate.DataManagers
 
                         AnsiConsole.Markup("[green]Storing session data into into database\n[/]");
                         if (sessionStats.dailyWorkouts.Count > 0 && sessionStats.dailyWorkouts[0].exercises.Count > 0)
-                            StoreSessionStats(sessionStats, workout.workoutId);
+                            StoreSessionStats(sessionStats, workout);
                         AnsiConsole.Markup("[green]Data storage successful\n[/]");
 
                         task.Increment(1);
@@ -155,11 +153,11 @@ namespace TrainerizeMigrate.DataManagers
             return _context.TrainingSessionWorkout.Where(x => x.newdailyWorkoutId == null).ToList();
         }
 
-        private TrainingSessionStatsResponse PullTrainingSessionStatsFromTrainerize(AuthenticationSession authDetails, int dailyWorkoutId)
+        private TrainingSessionStatsResponse PullTrainingSessionStatsFromTrainerize(AuthenticationSession authDetails, int? dailyWorkoutId)
         {
             TrainingSessionStatsRequest jsonBody = new TrainingSessionStatsRequest()
             {
-                ids = new List<int> { dailyWorkoutId },
+                ids = new List<int?> { dailyWorkoutId },
                 unitDistance = "km",
                 unitWeight = "kg",
                 userID = authDetails.userId
@@ -195,19 +193,49 @@ namespace TrainerizeMigrate.DataManagers
             return response;
         }
 
-        private bool StoreSessionStats(TrainingSessionStatsResponse sessionStats, int? workoutId)
+        private bool StoreSessionStats(TrainingSessionStatsResponse sessionStats, TrainingSessionWorkout workout)
         {
-            DailyWorkout workout = sessionStats.dailyWorkouts[0];
+            DailyWorkout dailyWorkout = sessionStats.dailyWorkouts[0];
 
-            foreach(TrainingSessionStatsExercise exercise in workout.exercises)
+            if (workout.stats == null)
+                workout.stats = new List<TrainingSessionStat>();
+
+            foreach (TrainingSessionStatsExercise exercise in dailyWorkout.exercises)
             {
+
                 foreach(Stat trainingStats in exercise.stats)
                 {
+                    TrainingSessionStat trainingStat = new TrainingSessionStat()
+                    {
+                        excersizeId = exercise.def.type == "system" ? exercise.def.id : GetNewCustomExcersizeId(exercise.def.id),
+                        calories = trainingStats.calories,
+                        dailyExerciseID = exercise.dailyExerciseID,
+                        distance = trainingStats.distance,
+                        level = trainingStats.level,
+                        reps = trainingStats.reps,
+                        setNumber = trainingStats.setID,
+                        speed = trainingStats.speed,
+                        time = trainingStats.time,
+                        weight = trainingStats.weight
+                    };
 
+                    workout.stats.Add(trainingStat);
+
+                    _context.TrainingSessionStat.Add(trainingStat);
                 }
+
             }
 
+            _context.TrainingSessionWorkout.Update(workout);
+            _context.SaveChanges();
+
             return true;
+        }
+
+        private int? GetNewCustomExcersizeId(int oldExcersizeId)
+        {
+            CustomExcersize excersize = _context.Excerisize.FirstOrDefault(x => x.id == oldExcersizeId);
+            return excersize.new_id;
         }
 
         static ProgressColumn[] GetProgressColumns()

@@ -7,7 +7,6 @@ using TrainerizeMigrate.Data;
 
 namespace TrainerizeMigrate.API
 {
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
     public class DailyWorkout
     {
         public int id { get; set; }

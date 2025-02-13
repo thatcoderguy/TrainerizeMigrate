@@ -1,4 +1,8 @@
-﻿https://api.trainerize.com/v03/dailyWorkout/set
+﻿
+insert workout -> get excersize ids -> insert workout stats
+
+
+https://api.trainerize.com/v03/dailyWorkout/set
 {"dailyWorkouts":[{"userID":21731103,"id":0,"date":"2025-02-12","name":"Full Body 5.","type":"workoutRegular","workoutID":173884110}],"unitDistance":"km","unitWeight":"kg"}
 
 {
@@ -12,6 +16,1046 @@
     "milestoneWorkout": 0
 }
 
+-------------------------------------------------------------
+
+
+https://api.trainerize.com/v03/dailyWorkout/get
+{"ids":[781149191],"userID":21731103,"unitDistance":"km","unitWeight":"kg"}
+{
+    "code": 0,
+    "statusMsg": "OK",
+    "dailyWorkouts": [
+        {
+            "id": 781149191,
+            "name": "Full Body 4.",
+            "date": "2025-02-07",
+            "startTime": null,
+            "endTime": null,
+            "type": "workoutRegular",
+            "media": null,
+            "style": "normal",
+            "status": "scheduled",
+            "instructions": "",
+            "exercises": [
+                {
+                    "dailyExerciseID": 5867174759,
+                    "def": {
+                        "id": 14,
+                        "name": "Barbell Overhead Press",
+                        "description": "1) Start by holding a barbell near your upper chest, in a slightly wider than shoulder width overhand grip. \r\n\r\n2) Press the bar overhead until your arms are extended, pause, return to start position and repeat.",
+                        "sets": 3,
+                        "target": "4-8 reps",
+                        "targetDetail": {
+                            "type": 10,
+                            "distance": null,
+                            "distanceUnit": null,
+                            "time": null,
+                            "text": "4-8 reps",
+                            "zone": null
+                        },
+                        "side": null,
+                        "superSetID": 0,
+                        "supersetType": "none",
+                        "intervalTime": 0,
+                        "restTime": 120,
+                        "recordType": "strength",
+                        "type": "system",
+                        "version": "2024-11-28 21:26:38",
+                        "media": {
+                            "isOverride": false,
+                            "type": "vimeo",
+                            "status": "ready",
+                            "token": "",
+                            "loopVideoToken": "336866096",
+                            "videoUrl": {
+                                "sd": null,
+                                "hd": null,
+                                "fhd": null,
+                                "hls": null,
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "loopVideoUrl": {
+                                "sd": "https://player.vimeo.com/progressive_redirect/playback/336866096/rendition/360p/file.mp4?loc=external&oauth2_token_id=89516033&signature=872abcdea9847e28269f42ec554de0229d4d5d394292ec9593c9f2dedfd2c864",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/progressive_redirect/playback/336866096/rendition/1080p/file.mp4?loc=external&oauth2_token_id=89516033&signature=13b854d05d794b3187239f09dce70668465036a3d5dd429e6172df3ba0a29331",
+                                "hls": "https://player.vimeo.com/external/336866096.m3u8?s=30149669e2a51cd67e4a3aa0444beb332a59c921&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "thumbnailUrl": {
+                                "hd": "https://video.trainerize.com/images/147961163/caa32b04-76f0-453d-a330-70543f90d3c5/HD.jpg",
+                                "sd": "https://video.trainerize.com/images/147961163/caa32b04-76f0-453d-a330-70543f90d3c5/SD.jpg"
+                            },
+                            "audioUrl": {
+                                "male": "https://video.trainerize.com/images/1776823/beae5d5b-4162-4923-bd89-d279a573a349/male.mp3",
+                                "female": "https://video.trainerize.com/images/1776823/beae5d5b-4162-4923-bd89-d279a573a349/female.mp3"
+                            },
+                            "default": {
+                                "videoToken": "",
+                                "loopVideoToken": "336866096",
+                                "videoUrls": {
+                                    "sd": null,
+                                    "hd": null,
+                                    "fhd": null,
+                                    "hls": null,
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "loopVideoUrls": {
+                                    "sd": "https://player.vimeo.com/progressive_redirect/playback/336866096/rendition/360p/file.mp4?loc=external&oauth2_token_id=89516033&signature=872abcdea9847e28269f42ec554de0229d4d5d394292ec9593c9f2dedfd2c864",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/progressive_redirect/playback/336866096/rendition/1080p/file.mp4?loc=external&oauth2_token_id=89516033&signature=13b854d05d794b3187239f09dce70668465036a3d5dd429e6172df3ba0a29331",
+                                    "hls": "https://player.vimeo.com/external/336866096.m3u8?s=30149669e2a51cd67e4a3aa0444beb332a59c921&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "thumbnailUrls": {
+                                    "hd": "https://video.trainerize.com/images/147961163/caa32b04-76f0-453d-a330-70543f90d3c5/HD.jpg",
+                                    "sd": "https://video.trainerize.com/images/147961163/caa32b04-76f0-453d-a330-70543f90d3c5/SD.jpg"
+                                }
+                            },
+                            "female": null
+                        },
+                        "videoType": "vimeo",
+                        "videoUrl": "",
+                        "videoStatus": "ready",
+                        "videoMobileUrl": {
+                            "mobile": null,
+                            "hd": null,
+                            "fhd": null,
+                            "hls": null,
+                            "hlssd": null,
+                            "hlshd": null
+                        },
+                        "numPhotos": 1,
+                        "tags": [
+                            {
+                                "type": "mainMuscle",
+                                "name": "shoulderSide"
+                            },
+                            {
+                                "type": "mainMuscle",
+                                "name": "shoulderFront"
+                            },
+                            {
+                                "type": "mainMuscle",
+                                "name": "shoulderRear"
+                            },
+                            {
+                                "type": "mainMuscle",
+                                "name": "traps"
+                            },
+                            {
+                                "type": "equipment",
+                                "name": "barbell"
+                            },
+                            {
+                                "type": "level",
+                                "name": "intermediate"
+                            },
+                            {
+                                "type": "mechanics",
+                                "name": "compound"
+                            },
+                            {
+                                "type": "force",
+                                "name": "push"
+                            },
+                            {
+                                "type": "movement",
+                                "name": "verticalPush"
+                            },
+                            {
+                                "type": "movement",
+                                "name": "biLateral"
+                            }
+                        ]
+                    },
+                    "stats": [
+                        {
+                            "id": 0,
+                            "setID": 1,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 2,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 3,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        }
+                    ]
+                },
+                {
+                    "dailyExerciseID": 5867174760,
+                    "def": {
+                        "id": 6380080,
+                        "name": "Smith Machine Incline Bench Press",
+                        "description": "1. Start by lying on a bench, angled at 45 degrees, with the bar in line with your chest.\r\n\r\n2. Grip it at shoulder-width, and slowly lower the bar down to your chest. \r\n\r\n3. Press it back up to the start position. Repeat.",
+                        "sets": 3,
+                        "target": "6-10 reps Tempo 3221",
+                        "targetDetail": {
+                            "type": 10,
+                            "distance": null,
+                            "distanceUnit": null,
+                            "time": null,
+                            "text": "6-10 reps Tempo 3221",
+                            "zone": null
+                        },
+                        "side": null,
+                        "superSetID": 0,
+                        "supersetType": "none",
+                        "intervalTime": 0,
+                        "restTime": 90,
+                        "recordType": "strength",
+                        "type": "system",
+                        "version": "2024-01-26 20:01:58",
+                        "media": {
+                            "isOverride": false,
+                            "type": "vimeo",
+                            "status": "ready",
+                            "token": "",
+                            "loopVideoToken": "444936350",
+                            "videoUrl": {
+                                "sd": null,
+                                "hd": null,
+                                "fhd": null,
+                                "hls": null,
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "loopVideoUrl": {
+                                "sd": "https://player.vimeo.com/external/444936350.sd.mp4?s=52462282325dddf1d26b942b1d0dd26257100e3e&profile_id=165&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/444936350.hd.mp4?s=9ebffb538ef3615968c397bba749add324a9be19&profile_id=174&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/444936350.m3u8?s=7b3be083442ad2ecad8426c752c4404a0162ace5&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "thumbnailUrl": {
+                                "hd": "https://video.trainerize.com/images/26481808/73a9550b-b9ba-45cf-9360-7c0989735924/HD.jpg",
+                                "sd": "https://video.trainerize.com/images/26481808/73a9550b-b9ba-45cf-9360-7c0989735924/SD.jpg"
+                            },
+                            "audioUrl": {
+                                "male": "https://video.trainerize.com/images/22820191/890686fd-869e-48ba-8fb0-2a17ad9b5c2a/male.mp3",
+                                "female": "https://video.trainerize.com/images/22820191/890686fd-869e-48ba-8fb0-2a17ad9b5c2a/female.mp3"
+                            },
+                            "default": {
+                                "videoToken": "",
+                                "loopVideoToken": "444936350",
+                                "videoUrls": {
+                                    "sd": null,
+                                    "hd": null,
+                                    "fhd": null,
+                                    "hls": null,
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "loopVideoUrls": {
+                                    "sd": "https://player.vimeo.com/external/444936350.sd.mp4?s=52462282325dddf1d26b942b1d0dd26257100e3e&profile_id=165&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/444936350.hd.mp4?s=9ebffb538ef3615968c397bba749add324a9be19&profile_id=174&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/444936350.m3u8?s=7b3be083442ad2ecad8426c752c4404a0162ace5&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "thumbnailUrls": {
+                                    "hd": "https://video.trainerize.com/images/26481808/73a9550b-b9ba-45cf-9360-7c0989735924/HD.jpg",
+                                    "sd": "https://video.trainerize.com/images/26481808/73a9550b-b9ba-45cf-9360-7c0989735924/SD.jpg"
+                                }
+                            },
+                            "female": {
+                                "videoToken": "",
+                                "loopVideoToken": "444932908",
+                                "videoUrls": {
+                                    "sd": null,
+                                    "hd": null,
+                                    "fhd": null,
+                                    "hls": null,
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "loopVideoUrls": {
+                                    "sd": "https://player.vimeo.com/external/444932908.sd.mp4?s=a159e699f98191e07f9e723ee704437df01f56da&profile_id=164&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/444932908.hd.mp4?s=633620b1269bcb0f610f28e9a0b800b8037bb6f0&profile_id=174&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/444932908.m3u8?s=b9e40e0e23e68e081ba8f420a3935b4d70942a0d&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "thumbnailUrls": {
+                                    "hd": "https://video.trainerize.com/images/26481810/c82bbb49-6caa-4a23-a718-3d7024e54e9e/HD.jpg",
+                                    "sd": "https://video.trainerize.com/images/26481810/c82bbb49-6caa-4a23-a718-3d7024e54e9e/SD.jpg"
+                                }
+                            }
+                        },
+                        "videoType": "vimeo",
+                        "videoUrl": "",
+                        "videoStatus": "ready",
+                        "videoMobileUrl": {
+                            "mobile": null,
+                            "hd": null,
+                            "fhd": null,
+                            "hls": null,
+                            "hlssd": null,
+                            "hlshd": null
+                        },
+                        "numPhotos": 1,
+                        "tags": [
+                            {
+                                "type": "mainMuscle",
+                                "name": "chestUpper"
+                            },
+                            {
+                                "type": "mainMuscle",
+                                "name": "shoulderFront"
+                            },
+                            {
+                                "type": "equipment",
+                                "name": "bench"
+                            },
+                            {
+                                "type": "equipment",
+                                "name": "smithMachine"
+                            },
+                            {
+                                "type": "level",
+                                "name": "beginner"
+                            },
+                            {
+                                "type": "mechanics",
+                                "name": "compound"
+                            },
+                            {
+                                "type": "movement",
+                                "name": "verticalPush"
+                            },
+                            {
+                                "type": "movement",
+                                "name": "biLateral"
+                            }
+                        ]
+                    },
+                    "stats": [
+                        {
+                            "id": 0,
+                            "setID": 1,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 2,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 3,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        }
+                    ]
+                },
+                {
+                    "dailyExerciseID": 5867174761,
+                    "def": {
+                        "id": 156,
+                        "name": "Plate Weighted Dip",
+                        "description": "1) Strap a weighted dip belt around your waist and grip the dip bars shoulder width apart with arms straight. \r\n\r\n2) Lower your body until you feel a stretch in your shoulders. Then push body back up to the starting position. \r\n\r\n3) Repeat.",
+                        "sets": 3,
+                        "target": "as reps as possible ",
+                        "targetDetail": {
+                            "type": 10,
+                            "distance": null,
+                            "distanceUnit": null,
+                            "time": null,
+                            "text": "as reps as possible ",
+                            "zone": null
+                        },
+                        "side": null,
+                        "superSetID": 0,
+                        "supersetType": "none",
+                        "intervalTime": 0,
+                        "restTime": 90,
+                        "recordType": "strength",
+                        "type": "system",
+                        "version": "2019-07-31 15:50:18",
+                        "media": {
+                            "isOverride": false,
+                            "type": "vimeo",
+                            "status": "ready",
+                            "token": "151380929",
+                            "loopVideoToken": "336868361",
+                            "videoUrl": {
+                                "sd": "https://player.vimeo.com/external/151380929.sd.mp4?s=ea02da937125e2d3348cfd6d01dd81d78a06f5d5&profile_id=112&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/151380929.hd.mp4?s=8593db342877a9e18ca50ef0a8914044b5fd995c&profile_id=119&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/151380929.m3u8?s=3c4e7207ae77715486334e370050638c4d998310&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "loopVideoUrl": {
+                                "sd": "https://player.vimeo.com/external/336868361.sd.mp4?s=acea313cc7009e233a1e6ad2c7e62e8d93db30f1&profile_id=164&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/336868361.hd.mp4?s=ab8caccfaa317ec9ad891428de9e8af54b51e0cd&profile_id=175&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/336868361.m3u8?s=eb1db4cd141ad5c3b5a3c32b344f74408e6f6e5f&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "thumbnailUrl": {
+                                "hd": "https://video.trainerize.com/images/7444705/f005057c-b082-4a40-b980-b84dc8f68f89/HD.jpg",
+                                "sd": "https://video.trainerize.com/images/7444705/f005057c-b082-4a40-b980-b84dc8f68f89/SD.jpg"
+                            },
+                            "audioUrl": {
+                                "male": "https://video.trainerize.com/images/7444705/f005057c-b082-4a40-b980-b84dc8f68f89/male.mp3",
+                                "female": "https://video.trainerize.com/images/7444705/f005057c-b082-4a40-b980-b84dc8f68f89/female.mp3"
+                            },
+                            "default": {
+                                "videoToken": "151380929",
+                                "loopVideoToken": "336868361",
+                                "videoUrls": {
+                                    "sd": "https://player.vimeo.com/external/151380929.sd.mp4?s=ea02da937125e2d3348cfd6d01dd81d78a06f5d5&profile_id=112&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/151380929.hd.mp4?s=8593db342877a9e18ca50ef0a8914044b5fd995c&profile_id=119&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/151380929.m3u8?s=3c4e7207ae77715486334e370050638c4d998310&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "loopVideoUrls": {
+                                    "sd": "https://player.vimeo.com/external/336868361.sd.mp4?s=acea313cc7009e233a1e6ad2c7e62e8d93db30f1&profile_id=164&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/336868361.hd.mp4?s=ab8caccfaa317ec9ad891428de9e8af54b51e0cd&profile_id=175&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/336868361.m3u8?s=eb1db4cd141ad5c3b5a3c32b344f74408e6f6e5f&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "thumbnailUrls": {
+                                    "hd": "https://video.trainerize.com/images/7444705/f005057c-b082-4a40-b980-b84dc8f68f89/HD.jpg",
+                                    "sd": "https://video.trainerize.com/images/7444705/f005057c-b082-4a40-b980-b84dc8f68f89/SD.jpg"
+                                }
+                            },
+                            "female": null
+                        },
+                        "videoType": "vimeo",
+                        "videoUrl": "151380929",
+                        "videoStatus": "ready",
+                        "videoMobileUrl": {
+                            "mobile": "https://player.vimeo.com/external/151380929.sd.mp4?s=ea02da937125e2d3348cfd6d01dd81d78a06f5d5&profile_id=112&oauth2_token_id=89516033",
+                            "hd": null,
+                            "fhd": "https://player.vimeo.com/external/151380929.hd.mp4?s=8593db342877a9e18ca50ef0a8914044b5fd995c&profile_id=119&oauth2_token_id=89516033",
+                            "hls": "https://player.vimeo.com/external/151380929.m3u8?s=3c4e7207ae77715486334e370050638c4d998310&oauth2_token_id=89516033",
+                            "hlssd": null,
+                            "hlshd": null
+                        },
+                        "numPhotos": 1,
+                        "tags": [
+                            {
+                                "type": "mainMuscle",
+                                "name": "triceps"
+                            },
+                            {
+                                "type": "equipment",
+                                "name": "plate"
+                            },
+                            {
+                                "type": "level",
+                                "name": "intermediate"
+                            },
+                            {
+                                "type": "mechanics",
+                                "name": "compound"
+                            },
+                            {
+                                "type": "force",
+                                "name": "push"
+                            },
+                            {
+                                "type": "movement",
+                                "name": "biLateral"
+                            }
+                        ]
+                    },
+                    "stats": [
+                        {
+                            "id": 0,
+                            "setID": 1,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 2,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 3,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        }
+                    ]
+                },
+                {
+                    "dailyExerciseID": 5867174762,
+                    "def": {
+                        "id": 523,
+                        "name": "Dumbbell Lying Reverse Lateral Raise",
+                        "description": "1.For this exercise, you’ll be primarily working the deltoids and mid back muscles.\r\n\r\n2.When you do the movement, you wanna articulate from the shoulder as best as you can\r\n\r\n3.While holding the dumbbells, lay with your chest down on a slightly inclined (around 15 degrees when measured from the floor) adjustable bench. \r\n\r\n4.Position the palms of the hands in a neutral manner (palms facing your torso) as you keep the arms extended with the elbow slightly bent. This will be your starting position.\r\n\r\n5.Now, raise your arms to the side until your elbows are at shoulder height and your arms are roughly parallel to the floor. \r\n\r\n6.Slowly lower the dumbbell to the starting position.\r\n\r\n7.Repeat for the recommended amount of repetitions.",
+                        "sets": 3,
+                        "target": "6-10 reps",
+                        "targetDetail": {
+                            "type": 10,
+                            "distance": null,
+                            "distanceUnit": null,
+                            "time": null,
+                            "text": "6-10 reps",
+                            "zone": null
+                        },
+                        "side": null,
+                        "superSetID": 0,
+                        "supersetType": "none",
+                        "intervalTime": 0,
+                        "restTime": 90,
+                        "recordType": "strength",
+                        "type": "system",
+                        "version": "2020-12-21 21:43:36",
+                        "media": {
+                            "isOverride": false,
+                            "type": "vimeo",
+                            "status": "ready",
+                            "token": "222961823",
+                            "loopVideoToken": "336868386",
+                            "videoUrl": {
+                                "sd": "https://player.vimeo.com/external/222961823.sd.mp4?s=595fd90e3a0739033d1a4593cfe3f0832012189f&profile_id=164&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/222961823.hd.mp4?s=ad98a4d588b4796ce8e3e7ae2968102a99504e69&profile_id=174&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/222961823.m3u8?s=318d9cde1559c31e5963a55687b3fdc40b513804&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "loopVideoUrl": {
+                                "sd": "https://player.vimeo.com/external/336868386.sd.mp4?s=23766986040392b428687675b02cfea23b9eec82&profile_id=139&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/336868386.hd.mp4?s=195469e2dd40a4b0117cb2a284f8c62472057f42&profile_id=175&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/336868386.m3u8?s=6dab5b0808f2c0f9955f0257609270e390e25224&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "thumbnailUrl": {
+                                "hd": "https://video.trainerize.com/images/22972240/9eb30019-6d87-4c70-b2ff-3e327eadae30/HD.jpg",
+                                "sd": "https://video.trainerize.com/images/22972240/9eb30019-6d87-4c70-b2ff-3e327eadae30/SD.jpg"
+                            },
+                            "audioUrl": {
+                                "male": "https://video.trainerize.com/images/1792618/4d5d602d-d14b-4030-9e98-57d21b65acc0/male.mp3",
+                                "female": "https://video.trainerize.com/images/1792618/4d5d602d-d14b-4030-9e98-57d21b65acc0/female.mp3"
+                            },
+                            "default": {
+                                "videoToken": "222961823",
+                                "loopVideoToken": "336868386",
+                                "videoUrls": {
+                                    "sd": "https://player.vimeo.com/external/222961823.sd.mp4?s=595fd90e3a0739033d1a4593cfe3f0832012189f&profile_id=164&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/222961823.hd.mp4?s=ad98a4d588b4796ce8e3e7ae2968102a99504e69&profile_id=174&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/222961823.m3u8?s=318d9cde1559c31e5963a55687b3fdc40b513804&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "loopVideoUrls": {
+                                    "sd": "https://player.vimeo.com/external/336868386.sd.mp4?s=23766986040392b428687675b02cfea23b9eec82&profile_id=139&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/336868386.hd.mp4?s=195469e2dd40a4b0117cb2a284f8c62472057f42&profile_id=175&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/336868386.m3u8?s=6dab5b0808f2c0f9955f0257609270e390e25224&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "thumbnailUrls": {
+                                    "hd": "https://video.trainerize.com/images/22972240/9eb30019-6d87-4c70-b2ff-3e327eadae30/HD.jpg",
+                                    "sd": "https://video.trainerize.com/images/22972240/9eb30019-6d87-4c70-b2ff-3e327eadae30/SD.jpg"
+                                }
+                            },
+                            "female": null
+                        },
+                        "videoType": "vimeo",
+                        "videoUrl": "222961823",
+                        "videoStatus": "ready",
+                        "videoMobileUrl": {
+                            "mobile": "https://player.vimeo.com/external/222961823.sd.mp4?s=595fd90e3a0739033d1a4593cfe3f0832012189f&profile_id=164&oauth2_token_id=89516033",
+                            "hd": null,
+                            "fhd": "https://player.vimeo.com/external/222961823.hd.mp4?s=ad98a4d588b4796ce8e3e7ae2968102a99504e69&profile_id=174&oauth2_token_id=89516033",
+                            "hls": "https://player.vimeo.com/external/222961823.m3u8?s=318d9cde1559c31e5963a55687b3fdc40b513804&oauth2_token_id=89516033",
+                            "hlssd": null,
+                            "hlshd": null
+                        },
+                        "numPhotos": 1,
+                        "tags": [
+                            {
+                                "type": "mainMuscle",
+                                "name": "shoulderRear"
+                            },
+                            {
+                                "type": "equipment",
+                                "name": "dumbbell"
+                            },
+                            {
+                                "type": "level",
+                                "name": "intermediate"
+                            },
+                            {
+                                "type": "mechanics",
+                                "name": "isolation"
+                            },
+                            {
+                                "type": "force",
+                                "name": "pull"
+                            },
+                            {
+                                "type": "movement",
+                                "name": "biLateral"
+                            }
+                        ]
+                    },
+                    "stats": [
+                        {
+                            "id": 0,
+                            "setID": 1,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 2,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 3,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        }
+                    ]
+                },
+                {
+                    "dailyExerciseID": 5867174763,
+                    "def": {
+                        "id": 463,
+                        "name": "Cable Straight Bar Skullcrusher",
+                        "description": "1.Lie on a bench holding the straight bar behind your head with your elbows bent. \r\n\r\n2.Straighten your arm over your head, keeping your shoulder steady.\r\n\r\n3. Return to starting position. \r\n\r\n4. Repeat. Complete all reps on one side before switching to the other side.",
+                        "sets": 3,
+                        "target": "8-10 reps",
+                        "targetDetail": {
+                            "type": 10,
+                            "distance": null,
+                            "distanceUnit": null,
+                            "time": null,
+                            "text": "8-10 reps",
+                            "zone": null
+                        },
+                        "side": null,
+                        "superSetID": 0,
+                        "supersetType": "none",
+                        "intervalTime": 0,
+                        "restTime": 90,
+                        "recordType": "strength",
+                        "type": "system",
+                        "version": "2020-12-29 20:19:45",
+                        "media": {
+                            "isOverride": false,
+                            "type": "vimeo",
+                            "status": "ready",
+                            "token": "172676037",
+                            "loopVideoToken": "336866269",
+                            "videoUrl": {
+                                "sd": "https://player.vimeo.com/external/172676037.sd.mp4?s=7fa6e8aed88b28aa3a0035bae3421c11c8612fd5&profile_id=165&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/172676037.hd.mp4?s=e21afc43670387f05f58de6e66ebaef2321d99aa&profile_id=119&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/172676037.m3u8?s=ed351706c83981bbaf9d2128923b4445a1667a76&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "loopVideoUrl": {
+                                "sd": "https://player.vimeo.com/external/336866269.sd.mp4?s=300821e4c73049fd2a95f7134128ebf69129ee2f&profile_id=139&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/336866269.hd.mp4?s=6aaf52511bfee7a9c498c06976f85d354879f6d5&profile_id=174&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/336866269.m3u8?s=d0cdf38e40641b5a8862bfb6522cdfaa4470fb1e&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "thumbnailUrl": {
+                                "hd": "https://video.trainerize.com/images/23216288/7b61f5fb-b537-433b-89db-8a70e0c757e8/HD.jpg",
+                                "sd": "https://video.trainerize.com/images/23216288/7b61f5fb-b537-433b-89db-8a70e0c757e8/SD.jpg"
+                            },
+                            "audioUrl": {
+                                "male": "https://video.trainerize.com/images/1790980/19be29e5-5d61-4b74-95be-aa4b747ea6fe/male.mp3",
+                                "female": "https://video.trainerize.com/images/1790980/19be29e5-5d61-4b74-95be-aa4b747ea6fe/female.mp3"
+                            },
+                            "default": {
+                                "videoToken": "172676037",
+                                "loopVideoToken": "336866269",
+                                "videoUrls": {
+                                    "sd": "https://player.vimeo.com/external/172676037.sd.mp4?s=7fa6e8aed88b28aa3a0035bae3421c11c8612fd5&profile_id=165&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/172676037.hd.mp4?s=e21afc43670387f05f58de6e66ebaef2321d99aa&profile_id=119&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/172676037.m3u8?s=ed351706c83981bbaf9d2128923b4445a1667a76&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "loopVideoUrls": {
+                                    "sd": "https://player.vimeo.com/external/336866269.sd.mp4?s=300821e4c73049fd2a95f7134128ebf69129ee2f&profile_id=139&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/336866269.hd.mp4?s=6aaf52511bfee7a9c498c06976f85d354879f6d5&profile_id=174&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/336866269.m3u8?s=d0cdf38e40641b5a8862bfb6522cdfaa4470fb1e&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "thumbnailUrls": {
+                                    "hd": "https://video.trainerize.com/images/23216288/7b61f5fb-b537-433b-89db-8a70e0c757e8/HD.jpg",
+                                    "sd": "https://video.trainerize.com/images/23216288/7b61f5fb-b537-433b-89db-8a70e0c757e8/SD.jpg"
+                                }
+                            },
+                            "female": null
+                        },
+                        "videoType": "vimeo",
+                        "videoUrl": "172676037",
+                        "videoStatus": "ready",
+                        "videoMobileUrl": {
+                            "mobile": "https://player.vimeo.com/external/172676037.sd.mp4?s=7fa6e8aed88b28aa3a0035bae3421c11c8612fd5&profile_id=165&oauth2_token_id=89516033",
+                            "hd": null,
+                            "fhd": "https://player.vimeo.com/external/172676037.hd.mp4?s=e21afc43670387f05f58de6e66ebaef2321d99aa&profile_id=119&oauth2_token_id=89516033",
+                            "hls": "https://player.vimeo.com/external/172676037.m3u8?s=ed351706c83981bbaf9d2128923b4445a1667a76&oauth2_token_id=89516033",
+                            "hlssd": null,
+                            "hlshd": null
+                        },
+                        "numPhotos": 1,
+                        "tags": [
+                            {
+                                "type": "mainMuscle",
+                                "name": "triceps"
+                            },
+                            {
+                                "type": "equipment",
+                                "name": "cable"
+                            },
+                            {
+                                "type": "level",
+                                "name": "beginner"
+                            },
+                            {
+                                "type": "mechanics",
+                                "name": "isolation"
+                            },
+                            {
+                                "type": "force",
+                                "name": "push"
+                            },
+                            {
+                                "type": "movement",
+                                "name": "biLateral"
+                            }
+                        ]
+                    },
+                    "stats": [
+                        {
+                            "id": 0,
+                            "setID": 1,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 2,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 3,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        }
+                    ]
+                },
+                {
+                    "dailyExerciseID": 5867174764,
+                    "def": {
+                        "id": 456,
+                        "name": "Cable V Bar Standing Tricep Extension",
+                        "description": "1.Grip the bar in both hands at chest level with your elbows bent.\r\n\r\n2.Push the bar down, fully extending your arms and keeping your shoulders steady.\r\n\r\n3.Your hands should finish at the top of your thighs in the downward position.\r\n\r\n4. Return to starting position.\r\n\r\n5. Repeat.",
+                        "sets": 3,
+                        "target": "6-10 reps",
+                        "targetDetail": {
+                            "type": 10,
+                            "distance": null,
+                            "distanceUnit": null,
+                            "time": null,
+                            "text": "6-10 reps",
+                            "zone": null
+                        },
+                        "side": null,
+                        "superSetID": 0,
+                        "supersetType": "none",
+                        "intervalTime": 0,
+                        "restTime": 90,
+                        "recordType": "strength",
+                        "type": "system",
+                        "version": "2020-12-29 20:14:04",
+                        "media": {
+                            "isOverride": false,
+                            "type": "vimeo",
+                            "status": "ready",
+                            "token": "172676394",
+                            "loopVideoToken": "336868143",
+                            "videoUrl": {
+                                "sd": "https://player.vimeo.com/external/172676394.sd.mp4?s=046a8d31857906c48082a9812b96f60f99f7f43d&profile_id=164&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/172676394.hd.mp4?s=154eac3c8ee3bfe6fa31e165ba9409e5cee04504&profile_id=174&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/172676394.m3u8?s=2b7b0e29b786f1d470c726b59fa98a05460e8507&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "loopVideoUrl": {
+                                "sd": "https://player.vimeo.com/external/336868143.sd.mp4?s=f7081646827b4528d2b7e11156a9fa87d7b61e37&profile_id=139&oauth2_token_id=89516033",
+                                "hd": null,
+                                "fhd": "https://player.vimeo.com/external/336868143.hd.mp4?s=6b20a3cb52e8b9e0e7d7995aa81f98b0cffe9183&profile_id=174&oauth2_token_id=89516033",
+                                "hls": "https://player.vimeo.com/external/336868143.m3u8?s=a422a1f492ab3f18c0c122d4a0dda10a0c2c9697&oauth2_token_id=89516033",
+                                "hlssd": null,
+                                "hlshd": null
+                            },
+                            "thumbnailUrl": {
+                                "hd": "https://video.trainerize.com/images/23216060/a29a809c-ca74-44d6-849d-d799e726a7f5/HD.jpg",
+                                "sd": "https://video.trainerize.com/images/23216060/a29a809c-ca74-44d6-849d-d799e726a7f5/SD.jpg"
+                            },
+                            "audioUrl": {
+                                "male": "https://video.trainerize.com/images/1790754/c55c9da7-360b-4d04-9a2b-8e04c6100e01/male.mp3",
+                                "female": "https://video.trainerize.com/images/1790754/c55c9da7-360b-4d04-9a2b-8e04c6100e01/female.mp3"
+                            },
+                            "default": {
+                                "videoToken": "172676394",
+                                "loopVideoToken": "336868143",
+                                "videoUrls": {
+                                    "sd": "https://player.vimeo.com/external/172676394.sd.mp4?s=046a8d31857906c48082a9812b96f60f99f7f43d&profile_id=164&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/172676394.hd.mp4?s=154eac3c8ee3bfe6fa31e165ba9409e5cee04504&profile_id=174&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/172676394.m3u8?s=2b7b0e29b786f1d470c726b59fa98a05460e8507&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "loopVideoUrls": {
+                                    "sd": "https://player.vimeo.com/external/336868143.sd.mp4?s=f7081646827b4528d2b7e11156a9fa87d7b61e37&profile_id=139&oauth2_token_id=89516033",
+                                    "hd": null,
+                                    "fhd": "https://player.vimeo.com/external/336868143.hd.mp4?s=6b20a3cb52e8b9e0e7d7995aa81f98b0cffe9183&profile_id=174&oauth2_token_id=89516033",
+                                    "hls": "https://player.vimeo.com/external/336868143.m3u8?s=a422a1f492ab3f18c0c122d4a0dda10a0c2c9697&oauth2_token_id=89516033",
+                                    "hlssd": null,
+                                    "hlshd": null
+                                },
+                                "thumbnailUrls": {
+                                    "hd": "https://video.trainerize.com/images/23216060/a29a809c-ca74-44d6-849d-d799e726a7f5/HD.jpg",
+                                    "sd": "https://video.trainerize.com/images/23216060/a29a809c-ca74-44d6-849d-d799e726a7f5/SD.jpg"
+                                }
+                            },
+                            "female": null
+                        },
+                        "videoType": "vimeo",
+                        "videoUrl": "172676394",
+                        "videoStatus": "ready",
+                        "videoMobileUrl": {
+                            "mobile": "https://player.vimeo.com/external/172676394.sd.mp4?s=046a8d31857906c48082a9812b96f60f99f7f43d&profile_id=164&oauth2_token_id=89516033",
+                            "hd": null,
+                            "fhd": "https://player.vimeo.com/external/172676394.hd.mp4?s=154eac3c8ee3bfe6fa31e165ba9409e5cee04504&profile_id=174&oauth2_token_id=89516033",
+                            "hls": "https://player.vimeo.com/external/172676394.m3u8?s=2b7b0e29b786f1d470c726b59fa98a05460e8507&oauth2_token_id=89516033",
+                            "hlssd": null,
+                            "hlshd": null
+                        },
+                        "numPhotos": 1,
+                        "tags": [
+                            {
+                                "type": "mainMuscle",
+                                "name": "triceps"
+                            },
+                            {
+                                "type": "equipment",
+                                "name": "cable"
+                            },
+                            {
+                                "type": "level",
+                                "name": "beginner"
+                            },
+                            {
+                                "type": "mechanics",
+                                "name": "isolation"
+                            },
+                            {
+                                "type": "force",
+                                "name": "push"
+                            },
+                            {
+                                "type": "movement",
+                                "name": "biLateral"
+                            }
+                        ]
+                    },
+                    "stats": [
+                        {
+                            "id": 0,
+                            "setID": 1,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 2,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        },
+                        {
+                            "id": 0,
+                            "setID": 3,
+                            "reps": null,
+                            "weight": null,
+                            "distance": null,
+                            "time": null,
+                            "calories": null,
+                            "level": null,
+                            "speed": null
+                        }
+                    ]
+                }
+            ],
+            "rounds": 1,
+            "duration": 2790,
+            "workDuration": null,
+            "hasOverride": false,
+            "trackingStats": {
+                "def": {
+                    "effortInterval": false,
+                    "restInterval": false,
+                    "minHeartRate": false,
+                    "maxHeartRate": false,
+                    "avgHeartRate": false,
+                    "zone": false
+                },
+                "stats": {
+                    "effortInterval": null,
+                    "restInterval": null,
+                    "minHeartRate": null,
+                    "maxHeartRate": null,
+                    "avgHeartRate": null,
+                    "zone": null,
+                    "calories": null,
+                    "activeCalories": null
+                }
+            },
+            "dateCreated": null,
+            "dateUpdated": "2025-02-13 10:28:58",
+            "createdBy": {
+                "id": 21731103,
+                "firstName": "D",
+                "lastName": "D"
+            },
+            "workoutID": 173884109,
+            "userID": 21731103,
+            "fromProgram": false,
+            "programDay": 0,
+            "intervalProgress": null,
+            "numberOfComments": 0,
+            "from": "trainerize"
+        }
+    ]
+}
 ------------------------------------------------------------
 
 https://api.trainerize.com/v03/dailyWorkout/set
@@ -22,7 +1066,7 @@ https://api.trainerize.com/v03/dailyWorkout/set
     {
       "id": 780784540,
       "name": "Full Body 1",
-      "date": "2025-02-08",
+      "date": "2025-02-07",
       "startTime": null,
       "endTime": null,
       "type": "workoutRegular",

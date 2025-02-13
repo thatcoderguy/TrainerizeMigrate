@@ -4,13 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrainerizeMigrate.API
+namespace TrainerizeMigrate.Data
 {
-    internal class AddTrainingSessionStatsRequest
+    public class TrainingSessionExcersize
     {
     }
-
-
-
-
 }
