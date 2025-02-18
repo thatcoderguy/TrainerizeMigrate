@@ -15,5 +15,7 @@
   "deletephaseurl": "https://api.trainerize.com/v03/trainingPlan/delete",
   "deletecustomexcersizeurl": "https://api.trainerize.com/v03/exercise/DeleteList",
   "gettrainingsessionworkoutlisturl": "https://api.trainerize.com/v03/progressReport/workout",
-  "gettrainingsessionstatsurl": "https://api.trainerize.com/v03/dailyWorkout/get"
+  "gettrainingsessionstatsurl": "https://api.trainerize.com/v03/dailyWorkout/get",
+  "addtrainingsessionurl": "https://api.trainerize.com/v03/dailyWorkout/set",
+  "addtrainingsessionstatsurl": "https://api.trainerize.com/v03/dailyWorkout/set"
 }

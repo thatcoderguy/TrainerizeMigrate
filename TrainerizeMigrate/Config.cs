@@ -34,6 +34,8 @@ namespace TrainerizeMigrate
         public string? deletecustomexcersizeurl { get; set; }
         public string? gettrainingsessionworkoutlisturl { get; set; }
         public string? gettrainingsessionstatsurl { get; set; }
+        public string? addtrainingsessionurl {  get; set; }
+        public string? addtrainingsessionstatsurl { get; set; }
     }
 
     public class Config
@@ -183,6 +185,16 @@ namespace TrainerizeMigrate
         public string GetTrainingSessionStatsUrl()
         {
             return _trainerizeurls.gettrainingsessionstatsurl;
+        }
+
+        public string AddTrainingSessionUrl()
+        {
+            return _trainerizeurls.addtrainingsessionurl;
+        }
+
+        public string AddTrainingSessionStatsUrl()
+        {
+            return _trainerizeurls.addtrainingsessionstatsurl;
         }
     }
 }

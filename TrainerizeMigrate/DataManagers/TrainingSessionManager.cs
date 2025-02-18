@@ -239,7 +239,7 @@ namespace TrainerizeMigrate.DataManagers
         public bool ImportTrainingSessions()
         {
             AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
-            AuthenticationSession authDetails = Authenticate.AuthenticateWithOriginalTrainerize(_config);
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerize(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
             AnsiConsole.Markup("[green]Reading training sessions from database\n[/]");
@@ -256,21 +256,105 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (TrainingSessionWorkout workout in trainingSessionWorkouts)
                     {
-                       // AnsiConsole.Markup("[green]Pulling workout on: " + workout.date + "\n[/]");
-                      //  TrainingSessionStatsResponse sessionStats = PullTrainingSessionStatsFromTrainerize(authDetails, workout.dailyWorkoutId);
+                        AnsiConsole.Markup("[green]Importing workout for: " + workout.date + "\n[/]");
+                        AddTrainingSessionResponse? workoutResponse = PushTrainingSession(authDetails, workout);
 
-                      //  AnsiConsole.Markup("[green]Storing session data into into database\n[/]");
-                     //   if (sessionStats.dailyWorkouts.Count > 0 && sessionStats.dailyWorkouts[0].exercises.Count > 0)
-                     //       StoreSessionStats(sessionStats, workout);
-                     //   AnsiConsole.Markup("[green]Data storage successful\n[/]");
+                        if (workoutResponse != null && workoutResponse.dailyWorkoutIDs.Count > 0)
+                        {
+                            UpdateDailyWorkoutId(workout.dailyWorkoutId, workoutResponse.dailyWorkoutIDs[0]);
+                            AnsiConsole.Markup("[green]Import successful\n[/]");
+                        }
+                        else
+                            AnsiConsole.Markup("[red]Import failed\n[/]");
 
                         task.Increment(1);
                     }
+
                     task.StopTask();
 
                 });
 
             return true;
+        }
+
+        private AddTrainingSessionResponse? PushTrainingSession(AuthenticationSession authDetails, TrainingSessionWorkout workout)
+        {
+            PlanWorkout? workoutDetails = GetWorkoutById(workout.workoutId);
+
+            if (workoutDetails == null)
+                return null;
+
+            AddTrainingSessionRequest jsonBody = new AddTrainingSessionRequest()
+            {
+                unitDistance = "km",
+                unitWeight = "kg",
+                dailyWorkouts = new List<AddDailyWorkout>()
+                {
+                    new AddDailyWorkout()
+                    {
+                        date = workout.date,
+                        id = 0,
+                        name = workout.workout,
+                        type = workoutDetails.type,
+                        userID = authDetails.userId,
+                        workoutID = workout.workoutId
+                    }
+                }
+            };
+
+            var authenticator = new JwtAuthenticator(authDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.AddTrainingSessionUrl();
+            request.Method = Method.Post;
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+            var queryResult = client.Execute(request);
+
+            AddTrainingSessionResponse? response = null;
+
+            try
+            {
+                response = JsonConvert.DeserializeObject<AddTrainingSessionResponse>(queryResult.Content);
+
+                if (response.dailyWorkoutIDs == null || response.dailyWorkoutIDs.Count == 0)
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        private bool UpdateDailyWorkoutId(int dailyWorkoutId, int? newDailyWorkoutId)
+        {
+            TrainingSessionWorkout? workout = _context.TrainingSessionWorkout.FirstOrDefault(x => x.dailyWorkoutId == dailyWorkoutId);
+            workout.newdailyWorkoutId = newDailyWorkoutId;
+            _context.TrainingSessionWorkout.Update(workout);
+            _context.SaveChanges();
+
+            return true;
+        }
+
+        private PlanWorkout? GetWorkoutById(int? workoutId)
+        {
+            return _context.TrainingPlanWorkout.Where(x => x.new_id == workoutId).FirstOrDefault();
+        }
+
+        private void LinkNewWorkoutExcersizesToOldWorkoutExcersizes(int? newWorkoutId)
+        {
+            //pull down new workout from new trainerize
+            //loop through excersises
+                //put new excersize id into traininGSTATS
+            //for all missing Ids
+                //(new Date).getTime()
+
         }
 
         public bool ImportTrainingSessionStats()
