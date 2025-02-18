@@ -11,6 +11,6 @@ namespace TrainerizeMigrate.API
     }
 
 
-
+    //dailyExerciseID: (new Date).getTime()
 
 }

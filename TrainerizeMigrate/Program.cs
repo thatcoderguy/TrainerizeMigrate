@@ -118,8 +118,14 @@ internal class Program
                     trainingSessionManager.ExtractAndStoreTrainingSessionStats();
                     break;
 
-                case "[red]Import Workout Session Data[/]":
+                case "[red]Import Training Sessions[/]":
+                    trainingSessionManager.ImportTrainingSessions();
                     break;
+
+                case "[red]Import Training Session Stats[/]":
+                    trainingSessionManager.ImportTrainingSessionStats();
+                    break;
+
 
                 case "[red]Exit[/]":
                     return (true, false); // Return false to indicate exit
@@ -146,7 +152,8 @@ internal class Program
             "[red]Import Phased Workout Plans[/]",
             "[red]Export and Store Workout Sessions[/]",
             "[red]Export and Store Workout Session Stats[/]",
-            "[red]Import Workout Session Data[/]",
+            "[red]Import Training Sessions[/]",
+            "[red]Import Training Session Stats[/]",
             "[red]Exit[/]"
         };
 

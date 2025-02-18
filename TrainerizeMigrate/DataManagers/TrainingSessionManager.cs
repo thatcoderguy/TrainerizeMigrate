@@ -5,7 +5,7 @@ using TrainerizeMigrate.API;
 using TrainerizeMigrate.Migrations;
 using Newtonsoft.Json;
 using TrainerizeMigrate.Data;
-using System.Numerics;
+using Microsoft.EntityFrameworkCore;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -202,7 +202,6 @@ namespace TrainerizeMigrate.DataManagers
 
             foreach (TrainingSessionStatsExercise exercise in dailyWorkout.exercises)
             {
-
                 foreach(Stat trainingStats in exercise.stats)
                 {
                     TrainingSessionStat trainingStat = new TrainingSessionStat()
@@ -223,7 +222,6 @@ namespace TrainerizeMigrate.DataManagers
 
                     _context.TrainingSessionStat.Add(trainingStat);
                 }
-
             }
 
             _context.TrainingSessionWorkout.Update(workout);
@@ -236,6 +234,91 @@ namespace TrainerizeMigrate.DataManagers
         {
             CustomExcersize excersize = _context.Excerisize.FirstOrDefault(x => x.id == oldExcersizeId);
             return excersize.new_id;
+        }
+
+        public bool ImportTrainingSessions()
+        {
+            AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithOriginalTrainerize(_config);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
+
+            AnsiConsole.Markup("[green]Reading training sessions from database\n[/]");
+            List<TrainingSessionWorkout> trainingSessionWorkouts = ReadTrainingSessionsNotImported();
+            AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
+
+            AnsiConsole.Progress()
+                .Columns(GetProgressColumns())
+                .Start(async ctx =>
+                {
+                    var task = ctx.AddTask($"[green]Importing training sessions...[/]", autoStart: false);
+                    task.MaxValue = trainingSessionWorkouts.Count;
+                    task.StartTask();
+
+                    foreach (TrainingSessionWorkout workout in trainingSessionWorkouts)
+                    {
+                       // AnsiConsole.Markup("[green]Pulling workout on: " + workout.date + "\n[/]");
+                      //  TrainingSessionStatsResponse sessionStats = PullTrainingSessionStatsFromTrainerize(authDetails, workout.dailyWorkoutId);
+
+                      //  AnsiConsole.Markup("[green]Storing session data into into database\n[/]");
+                     //   if (sessionStats.dailyWorkouts.Count > 0 && sessionStats.dailyWorkouts[0].exercises.Count > 0)
+                     //       StoreSessionStats(sessionStats, workout);
+                     //   AnsiConsole.Markup("[green]Data storage successful\n[/]");
+
+                        task.Increment(1);
+                    }
+                    task.StopTask();
+
+                });
+
+            return true;
+        }
+
+        public bool ImportTrainingSessionStats()
+        {
+            AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithOriginalTrainerize(_config);
+            AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
+
+            AnsiConsole.Markup("[green]Reading training sessions from database\n[/]");
+            List<TrainingSessionWorkout> trainingSessionWorkouts = ReadTrainingSessionStatsNotImported();
+            AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
+
+            AnsiConsole.Progress()
+                .Columns(GetProgressColumns())
+                .Start(async ctx =>
+                {
+                    var task = ctx.AddTask($"[green]Importing training session stat data...[/]", autoStart: false);
+                    task.MaxValue = trainingSessionWorkouts.Count;
+                    task.StartTask();
+
+                    foreach (TrainingSessionWorkout workout in trainingSessionWorkouts)
+                    {
+                        task.MaxValue += workout.stats.Count;
+
+                        foreach (TrainingSessionStat stat in workout.stats)
+                        {
+                            // AnsiConsole.Markup("[green]Pulling workout on: " + workout.date + "\n[/]");
+                            //  TrainingSessionStatsResponse sessionStats = PullTrainingSessionStatsFromTrainerize(authDetails, workout.dailyWorkoutId);
+
+                            //  AnsiConsole.Markup("[green]Storing session data into into database\n[/]");
+                            //   if (sessionStats.dailyWorkouts.Count > 0 && sessionStats.dailyWorkouts[0].exercises.Count > 0)
+                            //       StoreSessionStats(sessionStats, workout);
+                            //   AnsiConsole.Markup("[green]Data storage successful\n[/]");
+
+
+                        }
+                        task.Increment(1);
+                    }
+                    task.StopTask();
+
+                });
+
+            return true;
+        }
+
+        private List<TrainingSessionWorkout> ReadTrainingSessionStatsNotImported()
+        {
+            return _context.TrainingSessionWorkout.Include(x => x.stats.Where(t => t.newdailyExerciseID == null)).Where(y => y.newdailyWorkoutId != null).ToList();
         }
 
         static ProgressColumn[] GetProgressColumns()
