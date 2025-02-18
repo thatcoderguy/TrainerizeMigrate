@@ -54,7 +54,7 @@ internal class Program
 
             var mainMenuSelection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                    .PageSize(14)
+                    .PageSize(16)
                     .AddChoices(mainMenuOptions)
             );
 

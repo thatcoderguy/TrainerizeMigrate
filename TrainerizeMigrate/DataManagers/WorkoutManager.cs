@@ -631,6 +631,8 @@ namespace TrainerizeMigrate.DataManagers
 
         private bool DeleteProgramPhases(AuthenticationSession trainerAuthDetails, List<ProgramPhase> phases)
         {
+            bool deleteAll = true;
+
             AnsiConsole.Progress()
                 .Columns(GetProgressColumns())
                 .Start(async ctx =>
@@ -642,13 +644,18 @@ namespace TrainerizeMigrate.DataManagers
                     foreach (ProgramPhase phase in phases)
                     {
                         AnsiConsole.Markup("[green]Deleteing Phase " + phase.name + "\n[/]");
-                        if(DeleteProgramPhaseFromTrainerize(trainerAuthDetails, phase.new_id))
+                        if (DeleteProgramPhaseFromTrainerize(trainerAuthDetails, phase.new_id))
                             UpdateStoredTrainingPhase(phase.new_id);
+                        else
+                            deleteAll = false;
 
                         task.Increment(1);
                     }
                     task.StopTask();
                 });
+
+            if (deleteAll)
+                DeleteAllTrainingData();
 
             return false;
         }
@@ -683,10 +690,20 @@ namespace TrainerizeMigrate.DataManagers
 
         }
 
+        private void DeleteAllTrainingData()
+        {
+            _context.Database.ExecuteSqlRaw("TRUNCATE TABLE TrainingSessionStat");
+            _context.Database.ExecuteSqlRaw("TRUNCATE TABLE TrainingSessionWorkout");
+            _context.Database.ExecuteSqlRaw("TRUNCATE TABLE TrainingPlanWorkout");
+            _context.Database.ExecuteSqlRaw("TRUNCATE TABLE TrainingProgramPhase");
+            _context.SaveChanges();
+        }
+
         private void UpdateStoredTrainingPhase(int? phaseId)
         {
             ProgramPhase programPhase = _context.TrainingProgramPhase.FirstOrDefault(x => x.new_id == phaseId);
             programPhase.new_id = null;
+            programPhase.workoutsimported = false;
             _context.TrainingProgramPhase.Update(programPhase);
             _context.SaveChanges();
         }
