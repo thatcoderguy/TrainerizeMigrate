@@ -347,20 +347,10 @@ namespace TrainerizeMigrate.DataManagers
             return _context.TrainingPlanWorkout.Where(x => x.new_id == workoutId).FirstOrDefault();
         }
 
-        private void LinkNewWorkoutExcersizesToOldWorkoutExcersizes(int? newWorkoutId)
-        {
-            //pull down new workout from new trainerize
-            //loop through excersises
-                //put new excersize id into traininGSTATS
-            //for all missing Ids
-                //(new Date).getTime()
-
-        }
-
         public bool ImportTrainingSessionStats()
         {
             AnsiConsole.Markup("[green]Authenticating with Trainerize\n[/]");
-            AuthenticationSession authDetails = Authenticate.AuthenticateWithOriginalTrainerize(_config);
+            AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerize(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
             AnsiConsole.Markup("[green]Reading training sessions from database\n[/]");
@@ -379,18 +369,19 @@ namespace TrainerizeMigrate.DataManagers
                     {
                         task.MaxValue += workout.stats.Count;
 
-                        foreach (TrainingSessionStat stat in workout.stats)
+                        AnsiConsole.Markup("[green]Linking excersize IDs for workout on: " + workout.date + "\n[/]");
+                        if (LinkNewWorkoutExcersizesToOldWorkoutExcersizes(authDetails, workout))
                         {
-                            // AnsiConsole.Markup("[green]Pulling workout on: " + workout.date + "\n[/]");
-                            //  TrainingSessionStatsResponse sessionStats = PullTrainingSessionStatsFromTrainerize(authDetails, workout.dailyWorkoutId);
+                            AnsiConsole.Markup("[green]Excersizes linked OK\n[/]");
 
-                            //  AnsiConsole.Markup("[green]Storing session data into into database\n[/]");
-                            //   if (sessionStats.dailyWorkouts.Count > 0 && sessionStats.dailyWorkouts[0].exercises.Count > 0)
-                            //       StoreSessionStats(sessionStats, workout);
-                            //   AnsiConsole.Markup("[green]Data storage successful\n[/]");
-
+                            AnsiConsole.Markup("[green]Pushing training session into Trainerize\n[/]");
+                            if(!PushTrainingSessionIntoTrainerize(workout))
+                                AnsiConsole.Markup("[red]Training session push failed![/]");
 
                         }
+                        else
+                            AnsiConsole.Markup("[red]Excersize linking failed![/]");
+
                         task.Increment(1);
                     }
                     task.StopTask();
@@ -398,6 +389,71 @@ namespace TrainerizeMigrate.DataManagers
                 });
 
             return true;
+        }
+
+        private bool LinkNewWorkoutExcersizesToOldWorkoutExcersizes(AuthenticationSession authDetails, TrainingSessionWorkout workout)
+        {
+            //pulled from new trainerize
+            TrainingSessionStatsResponse newWorkout = PullTrainingSessionStatsFromTrainerize(authDetails, workout.newdailyWorkoutId);
+
+            foreach(DailyWorkout dailyWorkout in newWorkout.dailyWorkouts)
+            {
+                TrainingSessionWorkout? excersizesToMap = _context.TrainingSessionWorkout.Include(x => x.stats).FirstOrDefault(x => x.newdailyWorkoutId == dailyWorkout.id);
+
+                if (excersizesToMap == null)
+                    return false;
+
+                //loop through excersizes returned from trainerize
+                foreach (TrainingSessionStatsExercise exercise in dailyWorkout.exercises)
+                {
+                    //link excersizes downloaded to excersizes in schedule workout
+                    List<TrainingSessionStat>? statsToUpdate = excersizesToMap.stats.Where(x => x.excersizeId == exercise.def.id).ToList();
+                    if (statsToUpdate == null || statsToUpdate.Count == 0)
+                        return false;
+
+                    //update the dailyID for all matches excersizes
+                    foreach(TrainingSessionStat statToUpdate in statsToUpdate)
+                    {
+                        statToUpdate.newdailyExerciseID = exercise.dailyExerciseID;
+                        _context.TrainingSessionStat.Update(statToUpdate);
+                        _context.SaveChanges();
+                    }
+                }
+
+                //there may be some excersizes in the old trainerize, which have been added or changed.
+                List<TrainingSessionStat> unlinkedStats = excersizesToMap.stats.Where(x => x.newdailyExerciseID == null).ToList();
+
+                //create a new ID for all of those
+                foreach(TrainingSessionStat stat in unlinkedStats)
+                {
+                    DateTimeOffset dto = new DateTimeOffset(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Second, DateTime.Now.Nanosecond / 100, TimeSpan.Zero);
+
+                    stat.newdailyExerciseID = dto.ToUnixTimeMilliseconds();
+                    _context.TrainingSessionStat.Update(stat);
+                    _context.SaveChanges();
+                }
+            }
+
+            return true;
+        }
+
+        private bool PushTrainingSessionIntoTrainerize(TrainingSessionWorkout workout)
+        {
+            foreach (TrainingSessionStat stat in workout.stats)
+            {
+
+                // AnsiConsole.Markup("[green]Pulling workout on: " + workout.date + "\n[/]");
+                //  TrainingSessionStatsResponse sessionStats = PullTrainingSessionStatsFromTrainerize(authDetails, workout.dailyWorkoutId);
+
+                //  AnsiConsole.Markup("[green]Storing session data into into database\n[/]");
+                //   if (sessionStats.dailyWorkouts.Count > 0 && sessionStats.dailyWorkouts[0].exercises.Count > 0)
+                //       StoreSessionStats(sessionStats, workout);
+                //   AnsiConsole.Markup("[green]Data storage successful\n[/]");
+
+
+            }
+
+            return false;
         }
 
         private List<TrainingSessionWorkout> ReadTrainingSessionStatsNotImported()

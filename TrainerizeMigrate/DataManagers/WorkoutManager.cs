@@ -701,7 +701,7 @@ namespace TrainerizeMigrate.DataManagers
 
         private void UpdateStoredTrainingPhase(int? phaseId)
         {
-            ProgramPhase programPhase = _context.TrainingProgramPhase.FirstOrDefault(x => x.new_id == phaseId);
+            ProgramPhase? programPhase = _context.TrainingProgramPhase.FirstOrDefault(x => x.new_id == phaseId);
             programPhase.new_id = null;
             programPhase.workoutsimported = false;
             _context.TrainingProgramPhase.Update(programPhase);
