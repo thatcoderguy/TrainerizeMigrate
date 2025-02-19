@@ -18,7 +18,7 @@ namespace TrainerizeMigrate.API
 
     public class AddTrainingSessionStatsDailyWorkout
     {
-        public int id { get; set; }
+        public int? id { get; set; }
         public string? name { get; set; }
         public string? date { get; set; }
         public object startTime { get; set; }
@@ -70,9 +70,9 @@ namespace TrainerizeMigrate.API
     public class AddTrainingSessionStat
     {
         public int id { get; set; }
-        public int setID { get; set; }
+        public int? setID { get; set; }
         public int? reps { get; set; }
-        public int? weight { get; set; }
+        public double? weight { get; set; }
         public object distance { get; set; }
         public object time { get; set; }
         public object calories { get; set; }
