@@ -1,7 +1,8 @@
 {
   "loginurl": "https://api.trainerize.com/v03/user/login",
-  "getbodystatsdataurl": "https://api.trainerize.com/v03/graph/getBodystats",
-  "addbodystatsurl": "https://api.trainerize.com/v03/bodystats/add",
+  "getbodyweightdataurl": "https://api.trainerize.com/v03/graph/getBodystats",
+  "addbodyweighturl": "https://api.trainerize.com/v03/bodystats/add",
+  "getbodystatsdataurl": "https://api.trainerize.com/v03/bodystats/get",
   "addbodystatsdataurl": "https://api.trainerize.com/v03/bodystats/set",
   "performedexcersizesurl": "https://api.trainerize.com/v03/exercise/getPerformedExercises",
   "addcustomexcersizeurl": "https://api.trainerize.com/v03/exercise/add",

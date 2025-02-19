@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace TrainerizeMigrate.API
 {
-    //dailyExerciseID: (new Date).getTime()
-
-
     public class AddTrainingSessionStatsCreatedBy
     {
         public int id { get; set; }

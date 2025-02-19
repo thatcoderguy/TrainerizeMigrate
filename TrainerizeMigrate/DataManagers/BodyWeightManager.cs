@@ -30,9 +30,32 @@ namespace TrainerizeMigrate.DataManagers
             BodyWeightResponse bodyWeightData = PullBodyWeightData(authDetails);
             AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
 
-            AnsiConsole.Markup("[green]Storing body weight data into database\n[/]");
-            StoreBodyWeightData(bodyWeightData);
-            AnsiConsole.Markup("[green]Data storage successful\n[/]");
+
+            AnsiConsole.Progress()
+                .Columns(GetProgressColumns())
+                .Start(async ctx =>
+                {
+                    var task = ctx.AddTask($"[green]Extracting all body stats data...[/]", autoStart: false);
+                    task.MaxValue = bodyWeightData.points.Count;
+                    task.StartTask();
+
+                    foreach (Point weightPoint in bodyWeightData.points)
+                    {
+                        AnsiConsole.Markup("[green]Extracting body stats data for: " + weightPoint.date + "\n[/]");
+                        BodyStatsResponse bodyStats = PullBodyStatsData(authDetails, weightPoint.id, weightPoint.date);
+
+                        if (bodyStats == null)
+                            AnsiConsole.Markup("[red]Extract for: " + weightPoint.date + " failed!\n[/]");
+                        else
+                            StoreBodyStatData(bodyStats);
+                        AnsiConsole.Markup("[green]Data stored successfully\n[/]");
+
+
+                        task.Increment(1);
+                    }
+                    task.StopTask();
+                });
+
 
             return true;
         }
@@ -43,13 +66,13 @@ namespace TrainerizeMigrate.DataManagers
             AuthenticationSession authDetails = Authenticate.AuthenticateWithNewTrainerize(_config);
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
-            AnsiConsole.Markup("[green]Retreving body weight data from database\n[/]");
-            BodyWeight bodyWeightData = ReadBodyWeightData();
+            AnsiConsole.Markup("[green]Retreving body stats data from database\n[/]");
+            BodyWeight bodyWeightData = ReadBodyStatData();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
 
             if (bodyWeightData != null)
             {
-                PushBodyWeightData(authDetails, bodyWeightData);
+                PushBodyStatData(authDetails, bodyWeightData);
                 AnsiConsole.Markup("[green]Import sucessful\n[/]");
 
                 return true;
@@ -60,7 +83,7 @@ namespace TrainerizeMigrate.DataManagers
 
         private string GetLastRetreivedBodyWeightEntry()
         {
-            string? lastDate = _context.Body_Weight_Point.OrderByDescending(x => x.date).FirstOrDefault()?.date;
+            string? lastDate = _context.Body_Stat_Point.OrderByDescending(x => x.date).FirstOrDefault()?.date;
 
             if(lastDate != null)
             {
@@ -91,7 +114,7 @@ namespace TrainerizeMigrate.DataManagers
             };
             RestClient client = new RestClient(options);
             var request = new RestRequest();
-            request.Resource = _config.GetBodyStatsDataUrl();
+            request.Resource = _config.GetBodyWeightDataUrl();
             request.Method = Method.Post;
             request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
@@ -104,17 +127,78 @@ namespace TrainerizeMigrate.DataManagers
             return response;
         }
 
+        private BodyStatsResponse PullBodyStatsData(AuthenticationSession authDetails, int? bodyStatsId, string bodyStatsDate)
+        {
+            BodyStatsRequest jsonBody = new BodyStatsRequest()
+            {
+                date = bodyStatsDate,
+                id = bodyStatsId,
+                unitBodystats = "cm",
+                unitWeight = "kg",
+                userID = authDetails.userId
+            };
+
+            var authenticator = new JwtAuthenticator(authDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.GetBodyWeightDataUrl();
+            request.Method = Method.Post;
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+            var queryResult = client.Execute(request);
+
+            BodyStatsResponse? response = JsonSerializer.Deserialize<BodyStatsResponse>(queryResult.Content);
+
+            if (response == null || response.bodyMeasures == null)
+                return null;
+
+            return response;
+        }
+
+        private bool StoreBodyStatData(BodyStatsResponse bodyStatsData)
+        {
+            BodyMeasurePoint bodyStat = new BodyMeasurePoint()
+            {
+                bodyWeight = bodyStatsData.bodyMeasures.bodyWeight,
+                bodyFatPercent = bodyStatsData.bodyMeasures.bodyFatPercent,
+                bodyMassIndex = bodyStatsData.bodyMeasures.bodyMassIndex,
+                caliperMode = bodyStatsData.bodyMeasures.caliperMode,
+                chest = bodyStatsData.bodyMeasures.chest,
+                date = bodyStatsData.date,
+                id = bodyStatsData.id,
+                leftBicep = bodyStatsData.bodyMeasures.leftBicep,
+                leftCalf = bodyStatsData.bodyMeasures.leftCalf,
+                leftThigh = bodyStatsData.bodyMeasures.leftThigh,
+                restingHeartRate = bodyStatsData.bodyMeasures.restingHeartRate,
+                rightBicep = bodyStatsData.bodyMeasures.rightBicep,
+                rightCalf = bodyStatsData.bodyMeasures.rightCalf,
+                rightThigh = bodyStatsData.bodyMeasures.rightThigh,
+                shoulders = bodyStatsData.bodyMeasures.shoulders,
+                waist = bodyStatsData.bodyMeasures.waist,
+                newbodystatid = null
+            };
+
+            _context.Body_Stat_Point.Add(bodyStat);
+            _context.SaveChanges();
+
+            return true;
+        }
+
         private bool StoreBodyWeightData(BodyWeightResponse bodyWeightData)
         {
-            List<WeightPoint> weightPoints = new List<WeightPoint>();
+            List<BodyMeasurePoint> weightPoints = new List<BodyMeasurePoint>();
 
             foreach(Point datapoint in bodyWeightData.points)
             {
-                weightPoints.Add(new WeightPoint()
+                weightPoints.Add(new BodyMeasurePoint()
                 {
                     date = datapoint.date,
                     id = datapoint.id,
-                    value = datapoint.value,
+                    bodyWeight = datapoint.value,
                     newbodystatid = null
                 });
             }
@@ -136,18 +220,18 @@ namespace TrainerizeMigrate.DataManagers
                 });
             }
 
-            _context.Body_Weight_Point.AddRange(weightPoints);
+            _context.Body_Stat_Point.AddRange(weightPoints);
 
             _context.SaveChanges();
             return true;
         }
 
-        private BodyWeight? ReadBodyWeightData()
+        private BodyWeight? ReadBodyStatData()
         {
             return _context.Body_Weight.Include(x => x.points.Where(y => y.newbodystatid == null)).FirstOrDefault();
         }
 
-        private bool PushBodyWeightData(AuthenticationSession authDetails, BodyWeight bodyWeightData)
+        private bool PushBodyStatData(AuthenticationSession authDetails, BodyWeight bodyWeightData)
         {
 
             AnsiConsole.Progress()
@@ -158,14 +242,14 @@ namespace TrainerizeMigrate.DataManagers
                     task.MaxValue = bodyWeightData.points.Count;
                     task.StartTask();
 
-                    foreach (WeightPoint weightPoint in bodyWeightData.points)
+                    foreach (BodyMeasurePoint weightPoint in bodyWeightData.points)
                     {
                         int? BodyStatId = CreateBodyStat(authDetails, weightPoint.date);
 
                         if (BodyStatId != null)
                         {
-                            if (AddBodyStatsData(authDetails, BodyStatId, weightPoint.value, weightPoint.date))
-                                UpdateBodyWeightPointToUpdated(weightPoint.id, BodyStatId);
+                            if (AddBodyStatsData(authDetails, BodyStatId, weightPoint))
+                                UpdateBodyStatPointToUpdated(weightPoint.id, BodyStatId);
                             else
                                 AnsiConsole.Markup("[red]Body stat already exists for date: " + weightPoint.date + "\n[/]");
                         }
@@ -179,12 +263,12 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
-        private bool UpdateBodyWeightPointToUpdated(int bodyWeightId, int? newBodyStatsId)
+        private bool UpdateBodyStatPointToUpdated(int bodyWeightId, int? newBodyStatsId)
         {
-            WeightPoint? point = _context.Body_Weight_Point.FirstOrDefault(x => x.id == bodyWeightId);
+            BodyMeasurePoint? point = _context.Body_Stat_Point.FirstOrDefault(x => x.id == bodyWeightId);
             point.newbodystatid = newBodyStatsId;
 
-            _context.Body_Weight_Point.Update(point);
+            _context.Body_Stat_Point.Update(point);
             _context.SaveChanges();
 
             return true;
@@ -207,7 +291,7 @@ namespace TrainerizeMigrate.DataManagers
             };
             RestClient client = new RestClient(options);
             var request = new RestRequest();
-            request.Resource = _config.AddBodyStatUrl();
+            request.Resource = _config.AddBodyWeightUrl();
             request.Method = Method.Post;
             request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
@@ -220,22 +304,22 @@ namespace TrainerizeMigrate.DataManagers
             return response.bodyStatsID;
         }
 
-        private bool AddBodyStatsData(AuthenticationSession authDetails, int? bodyStatsID, double? bodyWeight, string date)
+        private bool AddBodyStatsData(AuthenticationSession authDetails, int? bodyStatsID, BodyMeasurePoint weightPoint)
         {
             AddBodyStatDataRequest jsonBody = new AddBodyStatDataRequest() { 
-                date = date,
+                date = weightPoint.date,
                 id  = bodyStatsID,
                 unitBodystats  = "cm",
                 unitWeight = "kg",
                 userID  = authDetails.userId,
                 bodyMeasures = new BodyMeasures()
                 {
-                    date = date,
-                    bodyWeight = bodyWeight.ToString(),
-                    caliperMode  = 7,
+                    date = weightPoint.date,
+                    bodyWeight = weightPoint.bodyWeight.ToString(),
+                    caliperMode  = weightPoint.caliperMode,
                     bloodPressureDiastolic = string.Empty,
                     bloodPressureSystolic = string.Empty,  
-                    bodyFatPercent = string.Empty,
+                    bodyFatPercent = weightPoint.bodyFatPercent.ToString(),
                     caliperAbdomen = string.Empty,
                     caliperAxilla = string.Empty,
                     caliperBF = string.Empty,
@@ -244,19 +328,19 @@ namespace TrainerizeMigrate.DataManagers
                     caliperSuprailiac = string.Empty,
                     caliperThigh = string.Empty,
                     caliperTriceps = string.Empty,
-                    chest = string.Empty,
+                    chest = weightPoint.chest.ToString(),
                     hips = string.Empty,
-                    leftBicep = string.Empty,
-                    leftCalf = string.Empty,
+                    leftBicep = weightPoint.leftBicep.ToString(),
+                    leftCalf = weightPoint.leftCalf.ToString(),
                     leftForearm = string.Empty,
-                    leftThigh = string.Empty,
+                    leftThigh = weightPoint.leftThigh.ToString(),
                     neck = string.Empty,
-                    rightBicep = string.Empty,
-                    rightCalf = string.Empty,
+                    rightBicep = weightPoint.rightBicep.ToString(),
+                    rightCalf = weightPoint.rightCalf.ToString(),
                     rightForearm = string.Empty,
                     rightThigh = string.Empty,
-                    shoulders = string.Empty,
-                    waist = string.Empty
+                    shoulders = weightPoint.shoulders.ToString(),
+                    waist = weightPoint.waist.ToString()
                 }
             };
 

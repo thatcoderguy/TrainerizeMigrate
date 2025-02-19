@@ -18,8 +18,9 @@ namespace TrainerizeMigrate
     public class TrainerizeUrls
     {
         public string? loginurl { get; set; }
+        public string? getbodyweightdataurl { get; set; }
+        public string? addbodyweighturl { get; set; }
         public string? getbodystatsdataurl { get; set; }
-        public string? addbodystatsurl { get; set; }
         public string? addbodystatsdataurl { get; set; }
         public string? performedexcersizesurl { get; set; }
         public string? addcustomexcersizeurl {  get; set; }
@@ -108,14 +109,19 @@ namespace TrainerizeMigrate
             return _trainerizeurls.loginurl;
         }
 
-        public string GetBodyStatsDataUrl()
+        public string GetBodyWeightDataUrl()
         {
-            return _trainerizeurls.getbodystatsdataurl;
+            return _trainerizeurls.getbodyweightdataurl;
         }
 
-        public string AddBodyStatUrl()
+        public string AddBodyWeightUrl()
         {
-            return _trainerizeurls.addbodystatsurl;
+            return _trainerizeurls.addbodyweighturl;
+        }
+
+        public string GetBodyStatDataUrl()
+        {
+            return _trainerizeurls.getbodystatsdataurl;
         }
 
         public string AddBodyStatDataUrl()

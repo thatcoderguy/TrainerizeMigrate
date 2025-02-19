@@ -10,6 +10,6 @@ namespace TrainerizeMigrate.Data
         public Guid Id { get; set; }
         public string? unit { get; set; }
         public string? goal { get; set; }
-        public virtual List<WeightPoint>? points { get; set; }
+        public virtual List<BodyMeasurePoint>? points { get; set; }
     }
 }
