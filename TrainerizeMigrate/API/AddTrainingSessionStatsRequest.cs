@@ -19,41 +19,28 @@ namespace TrainerizeMigrate.API
     public class AddTrainingSessionStatsDailyWorkout
     {
         public int id { get; set; }
-        public string name { get; set; }
-        public string date { get; set; }
+        public string? name { get; set; }
+        public string? date { get; set; }
         public object startTime { get; set; }
         public object endTime { get; set; }
         public string type { get; set; }
-        public object media { get; set; }
         public string style { get; set; }
         public string status { get; set; }
         public string instructions { get; set; }
         public List<AddTrainingSessionStatsExercise> exercises { get; set; }
         public int rounds { get; set; }
-        public int duration { get; set; }
-        public object workDuration { get; set; }
-        public bool hasOverride { get; set; }
-        public AddTrainingSessionTrackingStats trackingStats { get; set; }
-        public object dateCreated { get; set; }
-        public string dateUpdated { get; set; }
-        public AddTrainingSessionStatsCreatedBy createdBy { get; set; }
-        public int workoutID { get; set; }
+        public int? workoutID { get; set; }
         public int userID { get; set; }
-        public bool fromProgram { get; set; }
-        public int programDay { get; set; }
-        public object intervalProgress { get; set; }
-        public int numberOfComments { get; set; }
-        public string from { get; set; }
     }
 
     public class AddTrainingSessionDef
     {
-        public int id { get; set; }
+        public int? id { get; set; }
         public int sets { get; set; }
-        public int superSetID { get; set; }
-        public string supersetType { get; set; }
-        public int intervalTime { get; set; }
-        public int restTime { get; set; }
+        public int? superSetID { get; set; }
+        public string? supersetType { get; set; }
+        public int? intervalTime { get; set; }
+        public int? restTime { get; set; }
     }
 
     public class AddTrainingSessionTrackingDef
@@ -68,7 +55,7 @@ namespace TrainerizeMigrate.API
 
     public class AddTrainingSessionStatsExercise
     {
-        public long dailyExerciseID { get; set; }
+        public long? dailyExerciseID { get; set; }
         public AddTrainingSessionDef def { get; set; }
         public List<AddTrainingSessionStat> stats { get; set; }
     }

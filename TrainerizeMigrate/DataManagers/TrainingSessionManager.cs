@@ -375,7 +375,7 @@ namespace TrainerizeMigrate.DataManagers
                             AnsiConsole.Markup("[green]Excersizes linked OK\n[/]");
 
                             AnsiConsole.Markup("[green]Pushing training session into Trainerize\n[/]");
-                            if(!PushTrainingSessionIntoTrainerize(workout))
+                            if(!PushTrainingSessionIntoTrainerize(authDetails, workout))
                                 AnsiConsole.Markup("[red]Training session push failed![/]");
 
                         }
@@ -437,11 +437,84 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
-        private bool PushTrainingSessionIntoTrainerize(TrainingSessionWorkout workout)
+        private bool PushTrainingSessionIntoTrainerize(AuthenticationSession authDetails, TrainingSessionWorkout workout)
         {
-            foreach (TrainingSessionStat stat in workout.stats)
-            {
 
+            AddTrainingSessionStatsRequest jsonBody = new AddTrainingSessionStatsRequest()
+            {
+                dailyWorkouts = new List<AddTrainingSessionStatsDailyWorkout>()
+                {
+                    new AddTrainingSessionStatsDailyWorkout()
+                    {
+                        id = workout.dailyWorkoutId,
+                        date = workout.date,
+                        endTime = null,
+                        startTime = null,
+                        status = "tracked",
+                        style = "normal",
+                        name = workout.workout,
+                        instructions = "",
+                        rounds = 1,
+                        type = "workoutRegular",
+                        userID = authDetails.userId,
+                        workoutID = workout.workoutId,
+                        exercises = new List<AddTrainingSessionStatsExercise>()
+                    }
+                },
+                unitDistance= "km",
+                unitWeight = "kg"
+            };
+
+            long? excersizeId = 0;
+            AddTrainingSessionStatsExercise newExcersize = null;
+
+            foreach (TrainingSessionStat stat in workout.stats.OrderBy(x => x.newdailyExerciseID))
+            {
+                if(excersizeId != stat.newdailyExerciseID)
+                {
+                    if(newExcersize != null)
+                        jsonBody.dailyWorkouts[0].exercises.Add(newExcersize);
+
+                    WorkoutExcersize? excersize = _context.WorkoutExcersize.FirstOrDefault(x => x.PlanWorkoutId == workout.workoutId && x.id == stat.excersizeId);
+
+                    if (excersize == null)
+                        return false;
+
+                    newExcersize = new AddTrainingSessionStatsExercise()
+                    {
+                        dailyExerciseID = stat.newdailyExerciseID,
+                        def = new AddTrainingSessionDef()
+                        {
+                            id = stat.excersizeId,
+                            intervalTime = excersize.intervalTime,
+                            restTime = excersize.restTime,
+                            sets = 0,
+                            superSetID = excersize.superSetID,
+                            supersetType = excersize.superSetID >0 ? "superset" : "none"
+                        },
+                        stats = new List<AddTrainingSessionStat>()
+                        {
+                            new AddTrainingSessionStat()
+                            {
+
+                            }
+                        }
+                    };
+
+                    //create new
+                    excersizeId = stat.newdailyExerciseID;
+                }
+                else
+                {
+
+                    newExcersize.stats.Add(new AddTrainingSessionStat()
+                    {
+
+                    });
+                    //add set
+                }
+
+                jsonBody.dailyWorkouts[0].exercises.Add(newExcersize);
                 // AnsiConsole.Markup("[green]Pulling workout on: " + workout.date + "\n[/]");
                 //  TrainingSessionStatsResponse sessionStats = PullTrainingSessionStatsFromTrainerize(authDetails, workout.dailyWorkoutId);
 
@@ -452,6 +525,8 @@ namespace TrainerizeMigrate.DataManagers
 
 
             }
+
+
 
             return false;
         }

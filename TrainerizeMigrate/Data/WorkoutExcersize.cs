@@ -8,6 +8,8 @@ namespace TrainerizeMigrate.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid SystemId { get; set; }
+        [ForeignKey("PlanWorkoutId")]
+        public int PlanWorkoutId { get; set; }
         public int? id { get; set; }
         public int? sets { get; set; }
         public string? target { get; set; }
