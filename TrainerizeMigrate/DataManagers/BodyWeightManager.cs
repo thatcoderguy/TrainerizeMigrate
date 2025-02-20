@@ -6,6 +6,7 @@ using TrainerizeMigrate.Migrations;
 using TrainerizeMigrate.Data;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
+using System.Collections.Generic;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -67,12 +68,12 @@ namespace TrainerizeMigrate.DataManagers
             AnsiConsole.Markup("[green]Authenticatiion successful\n[/]");
 
             AnsiConsole.Markup("[green]Retreving body stats data from database\n[/]");
-            BodyWeight bodyWeightData = ReadBodyStatData();
+            List<BodyMeasurePoint> bodyStats = ReadBodyStatData();
             AnsiConsole.Markup("[green]Data retrival successful\n[/]");
 
-            if (bodyWeightData != null)
+            if (bodyStats.Count > 0)
             {
-                PushBodyStatData(authDetails, bodyWeightData);
+                PushBodyStatData(authDetails, bodyStats);
                 AnsiConsole.Markup("[green]Import sucessful\n[/]");
 
                 return true;
@@ -146,15 +147,24 @@ namespace TrainerizeMigrate.DataManagers
             };
             RestClient client = new RestClient(options);
             var request = new RestRequest();
-            request.Resource = _config.GetBodyWeightDataUrl();
+            request.Resource = _config.GetBodyStatDataUrl();
             request.Method = Method.Post;
             request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
             var queryResult = client.Execute(request);
 
-            BodyStatsResponse? response = JsonSerializer.Deserialize<BodyStatsResponse>(queryResult.Content);
+            BodyStatsResponse? response = null;
 
-            if (response == null || response.bodyMeasures == null)
+            try
+            {
+                response = JsonSerializer.Deserialize<BodyStatsResponse>(queryResult.Content);
+                if (response == null || response.bodyMeasures == null)
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
                 return null;
+            }
 
             return response;
         }
@@ -188,50 +198,13 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
-        private bool StoreBodyWeightData(BodyWeightResponse bodyWeightData)
+
+        private List<BodyMeasurePoint> ReadBodyStatData()
         {
-            List<BodyMeasurePoint> weightPoints = new List<BodyMeasurePoint>();
-
-            foreach(Point datapoint in bodyWeightData.points)
-            {
-                weightPoints.Add(new BodyMeasurePoint()
-                {
-                    date = datapoint.date,
-                    id = datapoint.id,
-                    bodyWeight = datapoint.value,
-                    newbodystatid = null
-                });
-            }
-
-            BodyWeight? bodyWeightRecord = _context.Body_Weight.FirstOrDefault();
-
-            if (bodyWeightRecord != null)
-            {
-                bodyWeightRecord.points.AddRange(weightPoints);
-                _context.Body_Weight.Update(bodyWeightRecord);
-            }
-            else
-            {
-                _context.Body_Weight.Add(new BodyWeight()
-                {
-                    goal = bodyWeightData.goal,
-                    points = weightPoints,
-                    unit = bodyWeightData.unit
-                });
-            }
-
-            _context.Body_Stat_Point.AddRange(weightPoints);
-
-            _context.SaveChanges();
-            return true;
+            return _context.Body_Stat_Point.Where(y => y.newbodystatid == null).ToList();
         }
 
-        private BodyWeight? ReadBodyStatData()
-        {
-            return _context.Body_Weight.Include(x => x.points.Where(y => y.newbodystatid == null)).FirstOrDefault();
-        }
-
-        private bool PushBodyStatData(AuthenticationSession authDetails, BodyWeight bodyWeightData)
+        private bool PushBodyStatData(AuthenticationSession authDetails, List<BodyMeasurePoint> bodyStats)
         {
 
             AnsiConsole.Progress()
@@ -239,10 +212,10 @@ namespace TrainerizeMigrate.DataManagers
                 .Start(async ctx =>
                 {
                     var task = ctx.AddTask($"[green]Importing body weight data...[/]", autoStart: false);
-                    task.MaxValue = bodyWeightData.points.Count;
+                    task.MaxValue = bodyStats.Count;
                     task.StartTask();
 
-                    foreach (BodyMeasurePoint weightPoint in bodyWeightData.points)
+                    foreach (BodyMeasurePoint weightPoint in bodyStats)
                     {
                         int? BodyStatId = CreateBodyStat(authDetails, weightPoint.date);
 

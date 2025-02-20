@@ -187,6 +187,7 @@ namespace TrainerizeMigrate.DataManagers
             }
             catch (Exception ex)
             {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
                 return null;
             }
 
@@ -326,6 +327,7 @@ namespace TrainerizeMigrate.DataManagers
             }
             catch (Exception ex)
             {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
                 return null;
             }
 
@@ -581,6 +583,7 @@ namespace TrainerizeMigrate.DataManagers
             }
             catch (Exception ex)
             {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
                 return false;
             }
 

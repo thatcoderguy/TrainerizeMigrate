@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrainerizeMigrate.Migrations;
 
@@ -10,9 +11,11 @@ using TrainerizeMigrate.Migrations;
 namespace TrainerizeMigrate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250220101215_allow null values for body stats")]
+    partial class allownullvaluesforbodystats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -22,6 +25,9 @@ namespace TrainerizeMigrate.Migrations
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("BodyWeightId")
+                        .HasColumnType("TEXT");
 
                     b.Property<double?>("bodyFatPercent")
                         .HasColumnType("REAL");
@@ -73,7 +79,26 @@ namespace TrainerizeMigrate.Migrations
 
                     b.HasKey("id");
 
+                    b.HasIndex("BodyWeightId");
+
                     b.ToTable("Body_Stat_Point");
+                });
+
+            modelBuilder.Entity("TrainerizeMigrate.Data.BodyWeight", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("goal")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("unit")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Body_Weight");
                 });
 
             modelBuilder.Entity("TrainerizeMigrate.Data.CustomExcersize", b =>
@@ -379,6 +404,13 @@ namespace TrainerizeMigrate.Migrations
                     b.ToTable("WorkoutExcersize");
                 });
 
+            modelBuilder.Entity("TrainerizeMigrate.Data.BodyMeasurePoint", b =>
+                {
+                    b.HasOne("TrainerizeMigrate.Data.BodyWeight", null)
+                        .WithMany("points")
+                        .HasForeignKey("BodyWeightId");
+                });
+
             modelBuilder.Entity("TrainerizeMigrate.Data.PlanWorkout", b =>
                 {
                     b.HasOne("TrainerizeMigrate.Data.ProgramPhase", null)
@@ -405,6 +437,11 @@ namespace TrainerizeMigrate.Migrations
                     b.HasOne("TrainerizeMigrate.Data.PlanWorkout", null)
                         .WithMany("excersizes")
                         .HasForeignKey("PlanWorkoutid");
+                });
+
+            modelBuilder.Entity("TrainerizeMigrate.Data.BodyWeight", b =>
+                {
+                    b.Navigation("points");
                 });
 
             modelBuilder.Entity("TrainerizeMigrate.Data.CustomExcersize", b =>

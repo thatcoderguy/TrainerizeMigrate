@@ -10,7 +10,6 @@ namespace TrainerizeMigrate.Migrations
 {
     public class ApplicationDbContext : DbContext
     {
-        public virtual DbSet<BodyWeight> Body_Weight { get; set; }
         public virtual DbSet<BodyMeasurePoint> Body_Stat_Point { get; set; }
         public virtual DbSet<CustomExcersize> Excerisize { get; set; }
         public virtual DbSet<Tag> Tag { get; set; }

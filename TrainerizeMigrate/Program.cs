@@ -60,11 +60,11 @@ internal class Program
 
             switch (mainMenuSelection)
             {
-                case "[red]Export and Store Body Weight Data[/]":
+                case "[red]Export and Store Body Stat Data[/]":
                     bodyWeightManager.ExtractAndStoreData();
                     break;
 
-                case "[red]Import Body Weight Data[/]":
+                case "[red]Import Body Stat Data[/]":
                    bodyWeightManager.ImportExtractedData();
                     break;
 
@@ -140,8 +140,8 @@ internal class Program
 
         return new List<string>
         {
-            "[red]Export and Store Body Weight Data[/]",
-            "[red]Import Body Weight Data[/]",
+            "[red]Export and Store Body Stat Data[/]",
+            "[red]Import Body Stat Data[/]",
             "[red]Export and Store Custom Excersizes[/]",
             "[red]Import Custom Excersizes[/]",
             "[red]Delete Custom Excersizes[/]",
