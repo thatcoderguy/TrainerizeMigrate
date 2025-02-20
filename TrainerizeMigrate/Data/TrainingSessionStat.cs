@@ -19,5 +19,6 @@ namespace TrainerizeMigrate.Data
         public double? level { get; set; }
         public double? speed { get; set; }
         public long? newdailyExerciseID { get; set; }
+        public int? order {  get; set; }
     }
 }

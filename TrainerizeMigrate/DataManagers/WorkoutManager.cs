@@ -201,7 +201,7 @@ namespace TrainerizeMigrate.DataManagers
                 .Columns(GetProgressColumns())
                 .Start(async ctx =>
                 {
-                    var task = ctx.AddTask($"[green]Importing custom excersize data...[/]", autoStart: false);
+                    var task = ctx.AddTask($"[green]Importing training phases...[/]", autoStart: false);
                     task.MaxValue = phases.Count;
                     task.StartTask();
 
@@ -216,6 +216,8 @@ namespace TrainerizeMigrate.DataManagers
                     }
                     task.StopTask();
                 });
+
+            AnsiConsole.Markup("[green]Training phases imported\n[/]");
 
             return false;
         }
@@ -320,19 +322,21 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (ProgramPhase phase in phases)
                     {
-                        AnsiConsole.Markup("[green]Pulling workouts for phase: " + phase.name + "\n[/]");
+                        //AnsiConsole.Markup("[green]Pulling workouts for phase: " + phase.name + "\n[/]");
                         PhaseWorkoutPlansResponse phaseWorkouts = PullPhaseWorkouts(authDetails, phase.id);
 
-                        AnsiConsole.Markup("[green]Storing training programs for phase into database\n[/]");
+                        //AnsiConsole.Markup("[green]Storing training programs for phase into database\n[/]");
                         if (phaseWorkouts.workouts.Count > 0)
                             StorePhaseWorkouts(phaseWorkouts, phase.id);
-                        AnsiConsole.Markup("[green]Data storage successful\n[/]");
+                        
 
                         task.Increment(1);
                     }
                     task.StopTask();
 
                 });
+
+            AnsiConsole.Markup("[green]Data storage successful\n[/]");
         }
 
         private void StorePhaseWorkouts(PhaseWorkoutPlansResponse phaseWorkouts, int phaseId)
@@ -460,7 +464,7 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (ProgramPhase phase in phases)
                     {
-                        AnsiConsole.Markup("[green]Importing phase: " + phase.name + "\n[/]");
+                        //AnsiConsole.Markup("[green]Importing phase: " + phase.name + "\n[/]");
 
                         task.MaxValue = task.MaxValue + phase.workouts.Count;
 
@@ -482,11 +486,13 @@ namespace TrainerizeMigrate.DataManagers
 
                     task.StopTask();
                 });
+
+            AnsiConsole.Markup("[green]Workout import successful\n[/]");
         }
 
         private int? PushWorkoutForPhase(AuthenticationSession trainerAuthDetails, int clientId, ProgramPhase phase, PlanWorkout workout)
         {
-            AnsiConsole.Markup("[green]Importing workout: " + workout.name + "\n[/]");
+            //AnsiConsole.Markup("[green]Importing workout: " + workout.name + "\n[/]");
 
             AddWorkoutRequest jsonBody = new AddWorkoutRequest()
             {

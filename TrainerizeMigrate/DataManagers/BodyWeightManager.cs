@@ -29,7 +29,7 @@ namespace TrainerizeMigrate.DataManagers
 
             AnsiConsole.Markup("[green]Pulling body weight data from trainerize\n[/]");
             BodyWeightResponse bodyWeightData = PullBodyWeightData(authDetails);
-            AnsiConsole.Markup("[green]Data retreieved successfully\n[/]");
+            AnsiConsole.Markup("[green]Data retrieved successfully\n[/]");
 
 
             AnsiConsole.Progress()
@@ -42,14 +42,14 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (Point weightPoint in bodyWeightData.points)
                     {
-                        AnsiConsole.Markup("[green]Extracting body stats data for: " + weightPoint.date + "\n[/]");
+                        //AnsiConsole.Markup("[green]Extracting body stats data for: " + weightPoint.date + "\n[/]");
                         BodyStatsResponse bodyStats = PullBodyStatsData(authDetails, weightPoint.id, weightPoint.date);
 
                         if (bodyStats == null)
                             AnsiConsole.Markup("[red]Extract for: " + weightPoint.date + " failed!\n[/]");
                         else
                             StoreBodyStatData(bodyStats);
-                        AnsiConsole.Markup("[green]Data stored successfully\n[/]");
+                        //AnsiConsole.Markup("[green]Data stored successfully\n[/]");
 
 
                         task.Increment(1);
@@ -57,6 +57,7 @@ namespace TrainerizeMigrate.DataManagers
                     task.StopTask();
                 });
 
+            AnsiConsole.Markup("[green]Data stored successfully\n[/]");
 
             return true;
         }
@@ -232,6 +233,7 @@ namespace TrainerizeMigrate.DataManagers
                     task.StopTask();
                 });
 
+            AnsiConsole.Markup("[green]Data imported successfully\n[/]");
 
             return true;
         }

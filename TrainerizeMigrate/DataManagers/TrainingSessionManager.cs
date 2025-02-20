@@ -131,19 +131,21 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (TrainingSessionWorkout workout in trainingSessionWorkouts)
                     {
-                        AnsiConsole.Markup("[green]Pulling workout on: " + workout.date + "\n[/]");
+                        //AnsiConsole.Markup("[green]Pulling workout on: " + workout.date + "\n[/]");
                         TrainingSessionStatsResponse sessionStats = PullTrainingSessionStatsFromTrainerize(authDetails, workout.dailyWorkoutId);
 
-                        AnsiConsole.Markup("[green]Storing session data into into database\n[/]");
+                        //AnsiConsole.Markup("[green]Storing session data into into database\n[/]");
                         if (sessionStats.dailyWorkouts.Count > 0 && sessionStats.dailyWorkouts[0].exercises.Count > 0)
                             StoreSessionStats(sessionStats, workout);
-                        AnsiConsole.Markup("[green]Data storage successful\n[/]");
+                        //AnsiConsole.Markup("[green]Data storage successful\n[/]");
 
                         task.Increment(1);
                     }
                     task.StopTask();
 
                 });
+
+            AnsiConsole.Markup("[green]Data storage successful\n[/]");
 
             return true;
         }
@@ -201,6 +203,8 @@ namespace TrainerizeMigrate.DataManagers
             if (workout.stats == null)
                 workout.stats = new List<TrainingSessionStat>();
 
+            int order = 0;
+
             foreach (TrainingSessionStatsExercise exercise in dailyWorkout.exercises)
             {
                 foreach(Stat trainingStats in exercise.stats)
@@ -216,13 +220,17 @@ namespace TrainerizeMigrate.DataManagers
                         setNumber = trainingStats.setID,
                         speed = trainingStats.speed,
                         time = trainingStats.time,
-                        weight = trainingStats.weight
+                        weight = trainingStats.weight,
+                        order = order
                     };
 
                     workout.stats.Add(trainingStat);
 
                     _context.TrainingSessionStat.Add(trainingStat);
                 }
+
+                order++;
+
             }
 
             _context.TrainingSessionWorkout.Update(workout);
@@ -257,13 +265,13 @@ namespace TrainerizeMigrate.DataManagers
 
                     foreach (TrainingSessionWorkout workout in trainingSessionWorkouts)
                     {
-                        AnsiConsole.Markup("[green]Importing workout for: " + workout.date + "\n[/]");
+                        //AnsiConsole.Markup("[green]Importing workout for: " + workout.date + "\n[/]");
                         AddTrainingSessionResponse? workoutResponse = PushTrainingSession(authDetails, workout);
 
                         if (workoutResponse != null && workoutResponse.dailyWorkoutIDs.Count > 0)
                         {
                             UpdateDailyWorkoutId(workout.dailyWorkoutId, workoutResponse.dailyWorkoutIDs[0]);
-                            AnsiConsole.Markup("[green]Import successful\n[/]");
+                            //AnsiConsole.Markup("[green]Import successful\n[/]");
                         }
                         else
                             AnsiConsole.Markup("[red]Import failed\n[/]");
@@ -274,6 +282,8 @@ namespace TrainerizeMigrate.DataManagers
                     task.StopTask();
 
                 });
+
+            AnsiConsole.Markup("[green]Import successful\n[/]");
 
             return true;
         }
@@ -371,16 +381,16 @@ namespace TrainerizeMigrate.DataManagers
                     {
                         task.MaxValue += workout.stats.Count;
 
-                        AnsiConsole.Markup("[green]Linking excersize IDs for workout on: " + workout.date + "\n[/]");
+                        //AnsiConsole.Markup("[green]Linking excersize IDs for workout on: " + workout.date + "\n[/]");
                         if (LinkNewWorkoutExcersizesToOldWorkoutExcersizes(authDetails, workout))
                         {
-                            AnsiConsole.Markup("[green]Excersizes linked OK\n[/]");
+                            //AnsiConsole.Markup("[green]Excersizes linked OK\n[/]");
 
-                            AnsiConsole.Markup("[green]Pushing training session into Trainerize\n[/]");
+                            //AnsiConsole.Markup("[green]Pushing training session into Trainerize\n[/]");
                             if(!PushTrainingSessionIntoTrainerize(authDetails, workout))
-                                AnsiConsole.Markup("[red]Training session push failed![/]");
-                            else
-                                AnsiConsole.Markup("[green]Training session data imported\n[/]");
+                                AnsiConsole.Markup("[red]Training session " + workout.date + " push failed![/]");
+                           // else
+                            //    AnsiConsole.Markup("[green]Training session data imported\n[/]");
                         }
                         else
                             AnsiConsole.Markup("[red]Excersize linking failed![/]");
@@ -390,6 +400,8 @@ namespace TrainerizeMigrate.DataManagers
                     task.StopTask();
 
                 });
+
+            AnsiConsole.Markup("[green]Training session data imported\n[/]");
 
             return true;
         }
@@ -401,6 +413,7 @@ namespace TrainerizeMigrate.DataManagers
 
             foreach(DailyWorkout dailyWorkout in newWorkout.dailyWorkouts)
             {
+                //get excersizes from old trainerize in DB
                 TrainingSessionWorkout? excersizesToMap = _context.TrainingSessionWorkout.Include(x => x.stats).FirstOrDefault(x => x.newdailyWorkoutId == dailyWorkout.id);
 
                 if (excersizesToMap == null)
@@ -411,8 +424,8 @@ namespace TrainerizeMigrate.DataManagers
                 {
                     //link excersizes downloaded to excersizes in schedule workout
                     List<TrainingSessionStat>? statsToUpdate = excersizesToMap.stats.Where(x => x.excersizeId == exercise.def.id).ToList();
-                    if (statsToUpdate == null || statsToUpdate.Count == 0)
-                        return false;
+
+                    //if not matched - then it was replaced
 
                     //update the dailyID for all matches excersizes
                     foreach(TrainingSessionStat statToUpdate in statsToUpdate)
@@ -423,17 +436,32 @@ namespace TrainerizeMigrate.DataManagers
                     }
                 }
 
-                //there may be some excersizes in the old trainerize, which have been added or changed.
-                List<TrainingSessionStat> unlinkedStats = excersizesToMap.stats.Where(x => x.newdailyExerciseID == null).ToList();
+                //there may be some excersizes in the old trainerize, which have been added or substuted
+                List<TrainingSessionStat> unlinkedStats = excersizesToMap.stats.Where(x => x.newdailyExerciseID == null).OrderBy(x => x.excersizeId).ToList();
 
-                //create a new ID for all of those
-                foreach(TrainingSessionStat stat in unlinkedStats)
+                int? excersizeId = 0;
+                DateTimeOffset dto = DateTimeOffset.Now;
+
+                //create a new daily excersize for all of new/subs
+                foreach (TrainingSessionStat stat in unlinkedStats)
                 {
-                    DateTimeOffset dto = new DateTimeOffset(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Second, DateTime.Now.Nanosecond / 100, TimeSpan.Zero);
+                    if (excersizeId != stat.excersizeId && excersizeId > 0)
+                    {
 
-                    stat.newdailyExerciseID = dto.ToUnixTimeMilliseconds();
-                    _context.TrainingSessionStat.Update(stat);
-                    _context.SaveChanges();
+                        dto = new DateTimeOffset(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Second, DateTime.Now.Nanosecond / 100, TimeSpan.Zero);
+
+                        stat.newdailyExerciseID = dto.ToUnixTimeMilliseconds();
+                        _context.TrainingSessionStat.Update(stat);
+                        _context.SaveChanges();
+
+                        excersizeId = stat.excersizeId;
+                    }
+                    else
+                    {
+                        stat.newdailyExerciseID = dto.ToUnixTimeMilliseconds();
+                        _context.TrainingSessionStat.Update(stat);
+                        _context.SaveChanges();
+                    }
                 }
             }
 
@@ -471,31 +499,41 @@ namespace TrainerizeMigrate.DataManagers
             long? excersizeId = 0;
             AddTrainingSessionStatsExercise newExcersize = null;
 
-            foreach (TrainingSessionStat stat in workout.stats.OrderBy(x => x.newdailyExerciseID))
+            foreach (TrainingSessionStat stat in workout.stats.OrderBy(x => x.order).ThenBy(x => x.setNumber))
             {
-                if (excersizeId != stat.newdailyExerciseID)
+                if (stat.reps == null && stat.weight == null)
                 {
-                    if (newExcersize != null)
-                        pushTrainingStatsRequest.dailyWorkouts[0].exercises.Add(newExcersize);
 
-                    WorkoutExcersize excersize = GetExcersizeFromWorkout(workout.workoutId, stat.excersizeId);
-
-                    if (excersize == null)
-                        return null;
-
-                    newExcersize = new AddTrainingSessionStatsExercise()
+                }
+                else
+                {
+                    if (excersizeId != stat.newdailyExerciseID)
                     {
-                        dailyExerciseID = stat.newdailyExerciseID,
-                        def = new AddTrainingSessionDef()
+                        if (newExcersize != null)
                         {
-                            id = stat.excersizeId,
-                            intervalTime = excersize.intervalTime,
-                            restTime = excersize.restTime,
-                            sets = 0,
-                            superSetID = excersize.superSetID,
-                            supersetType = excersize.superSetID > 0 ? "superset" : "none"
-                        },
-                        stats = new List<AddTrainingSessionStat>()
+                            newExcersize.def.sets = newExcersize.stats.Count;
+                            pushTrainingStatsRequest.dailyWorkouts[0].exercises.Add(newExcersize);
+                        }
+
+                        WorkoutExcersize excersize = GetExcersizeFromWorkout(workout.workoutId, stat.excersizeId);
+
+                        if (excersize == null)
+                            return null;
+
+                        newExcersize = new AddTrainingSessionStatsExercise()
+                        {
+                            dailyExerciseID = stat.newdailyExerciseID,
+                            def = new AddTrainingSessionDef()
+                            {
+                                id = stat.excersizeId,
+                                intervalTime = excersize.intervalTime,
+                                restTime = excersize.restTime,
+                                sets = 0,
+                                superSetID = excersize.superSetID,
+                                supersetType = excersize.superSetID > 0 ? "superset" : "none",
+                                target = excersize.target
+                            },
+                            stats = new List<AddTrainingSessionStat>()
                         {
                             new AddTrainingSessionStat()
                             {
@@ -518,36 +556,41 @@ namespace TrainerizeMigrate.DataManagers
                                 weight = stat.weight
                             }
                         }
-                    };
+                        };
 
-                    excersizeId = stat.newdailyExerciseID;
-                }
-                else
-                {
-                    newExcersize.stats.Add(new AddTrainingSessionStat()
+                        excersizeId = stat.newdailyExerciseID;
+                    }
+                    else
                     {
-                        avgPace = null,
-                        avgSpeed = null,
-                        calories = null,
-                        distance = null,
-                        level = null,
-                        speed = null,
-                        time = null,
-                        id = 0,
-                        units = new Units()
+                        newExcersize.stats.Add(new AddTrainingSessionStat()
                         {
-                            distance = "km",
-                            weight = "kg",
-                            bodystats = "cm"
-                        },
-                        reps = stat.reps,
-                        setID = stat.setNumber,
-                        weight = stat.weight
-                    });
+                            avgPace = null,
+                            avgSpeed = null,
+                            calories = null,
+                            distance = null,
+                            level = null,
+                            speed = null,
+                            time = null,
+                            id = 0,
+                            units = new Units()
+                            {
+                                distance = "km",
+                                weight = "kg",
+                                bodystats = "cm"
+                            },
+                            reps = stat.reps,
+                            setID = stat.setNumber,
+                            weight = stat.weight
+                        });
+                    }
                 }
             }
 
-            pushTrainingStatsRequest.dailyWorkouts[0].exercises.Add(newExcersize);
+            if (newExcersize != null)
+            {
+                newExcersize.def.sets = newExcersize.stats.Count;
+                pushTrainingStatsRequest.dailyWorkouts[0].exercises.Add(newExcersize);
+            }
 
             return pushTrainingStatsRequest;
         }
@@ -556,7 +599,7 @@ namespace TrainerizeMigrate.DataManagers
         {
             AddTrainingSessionStatsRequest jsonBody = CreatePushTrainingStatsRequest(authDetails, workout);
 
-            if (jsonBody == null)
+            if (jsonBody == null || jsonBody.dailyWorkouts[0].exercises.Count == 0)
                 return false;
 
             var authenticator = new JwtAuthenticator(authDetails.token);
