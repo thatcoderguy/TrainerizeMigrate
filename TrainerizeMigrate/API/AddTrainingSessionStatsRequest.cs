@@ -39,6 +39,7 @@ namespace TrainerizeMigrate.API
         public int? intervalTime { get; set; }
         public int? restTime { get; set; }
         public string? target {  get; set; }
+        public string? targetDetail {  get; set; }
     }
 
     public class AddTrainingSessionTrackingDef

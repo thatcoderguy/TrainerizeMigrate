@@ -1,11 +1,11 @@
-﻿using RestSharp.Authenticators;
+﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using RestSharp;
+using RestSharp.Authenticators;
 using Spectre.Console;
 using TrainerizeMigrate.API;
-using TrainerizeMigrate.Migrations;
-using Newtonsoft.Json;
 using TrainerizeMigrate.Data;
-using Microsoft.EntityFrameworkCore;
+using TrainerizeMigrate.Migrations;
 
 namespace TrainerizeMigrate.DataManagers
 {
@@ -85,7 +85,7 @@ namespace TrainerizeMigrate.DataManagers
 
         private bool StoreTrainingSessionWorkouts(WorkoutTrainingSessionListReponse trainingSessionWorkouts)
         {
-            foreach(WorkoutList workout in trainingSessionWorkouts.workouts)
+            foreach (WorkoutList workout in trainingSessionWorkouts.workouts)
             {
                 TrainingSessionWorkout trainingSessionWorkout = new TrainingSessionWorkout()
                 {
@@ -207,7 +207,7 @@ namespace TrainerizeMigrate.DataManagers
 
             foreach (TrainingSessionStatsExercise exercise in dailyWorkout.exercises)
             {
-                foreach(Stat trainingStats in exercise.stats)
+                foreach (Stat trainingStats in exercise.stats)
                 {
                     TrainingSessionStat trainingStat = new TrainingSessionStat()
                     {
@@ -387,9 +387,9 @@ namespace TrainerizeMigrate.DataManagers
                             //AnsiConsole.Markup("[green]Excersizes linked OK\n[/]");
 
                             //AnsiConsole.Markup("[green]Pushing training session into Trainerize\n[/]");
-                            if(!PushTrainingSessionIntoTrainerize(authDetails, workout))
+                            if (!PushTrainingSessionIntoTrainerize(authDetails, workout))
                                 AnsiConsole.Markup("[red]Training session " + workout.date + " push failed![/]");
-                           // else
+                            // else
                             //    AnsiConsole.Markup("[green]Training session data imported\n[/]");
                         }
                         else
@@ -406,12 +406,37 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
+
+        private bool LinkNewWorkoutExcersizesToOldWorkoutExcersizes2(AuthenticationSession authDetails, TrainingSessionWorkout workout)
+        {
+
+            //get workoutstats  -> [id] , ,[calories] ,[dailyExerciseID] ,[distance] ,[level] ,[newdailyExerciseID] ,[reps] ,[setNumber] ,[speed] ,[time] ,[weight] ,[excersizeId] ,[order]
+            //get workoutexcersize  -> [SystemId] , ,[id] ,[intervalTime] ,[order] ,[restTime] ,[sets] ,[superSetID] ,[target] ,[targetDetailText] ,[targetDetailTime] ,[targetDetailType]
+
+            //get stats from new trainerize workout - for new daily exceerisze ids
+
+            //check if excersize id exists in workoutexcersize
+                //yes - update workoutstats - dailyexcersizeid
+
+                //no - update workoutstats - generate new id
+
+
+
+            //if item same... then get daily excersize id
+            //if item is added... then new id
+            //if item is sub... then new id   --- ensure old item is removed
+
+
+
+            return true;
+        }
+
         private bool LinkNewWorkoutExcersizesToOldWorkoutExcersizes(AuthenticationSession authDetails, TrainingSessionWorkout workout)
         {
             //pulled from new trainerize
             TrainingSessionStatsResponse newWorkout = PullTrainingSessionStatsFromTrainerize(authDetails, workout.newdailyWorkoutId);
 
-            foreach(DailyWorkout dailyWorkout in newWorkout.dailyWorkouts)
+            foreach (DailyWorkout dailyWorkout in newWorkout.dailyWorkouts)
             {
                 //get excersizes from old trainerize in DB
                 TrainingSessionWorkout? excersizesToMap = _context.TrainingSessionWorkout.Include(x => x.stats).FirstOrDefault(x => x.newdailyWorkoutId == dailyWorkout.id);
@@ -428,7 +453,7 @@ namespace TrainerizeMigrate.DataManagers
                     //if not matched - then it was replaced
 
                     //update the dailyID for all matches excersizes
-                    foreach(TrainingSessionStat statToUpdate in statsToUpdate)
+                    foreach (TrainingSessionStat statToUpdate in statsToUpdate)
                     {
                         statToUpdate.newdailyExerciseID = exercise.dailyExerciseID;
                         _context.TrainingSessionStat.Update(statToUpdate);
@@ -489,24 +514,25 @@ namespace TrainerizeMigrate.DataManagers
                         type = "workoutRegular",
                         userID = authDetails.userId,
                         workoutID = workout.workoutId,
-                        exercises = new List<AddTrainingSessionStatsExercise>()
+                        exercises = new List<AddTrainingSessionStatsExercise>(),
                     }
                 },
-                unitDistance= "km",
+                unitDistance = "km",
                 unitWeight = "kg"
             };
 
             long? excersizeId = 0;
             AddTrainingSessionStatsExercise newExcersize = null;
+            List<TrainingSessionStat> orderedStats = workout.stats.OrderBy(x => x.order).ThenBy(x => x.setNumber).ToList();
 
-            foreach (TrainingSessionStat stat in workout.stats.OrderBy(x => x.order).ThenBy(x => x.setNumber))
+            foreach (TrainingSessionStat stat in orderedStats)
             {
-                if (stat.reps == null && stat.weight == null)
-                {
+                //if (stat.reps == null && stat.weight == null)
+                //{
 
-                }
-                else
-                {
+                //}
+                //else
+                //{
                     if (excersizeId != stat.newdailyExerciseID)
                     {
                         if (newExcersize != null)
@@ -518,7 +544,7 @@ namespace TrainerizeMigrate.DataManagers
                         WorkoutExcersize excersize = GetExcersizeFromWorkout(workout.workoutId, stat.excersizeId);
 
                         if (excersize == null)
-                            return null;
+                            excersize = GetExcersizeFromAnyWorkout(stat.excersizeId);
 
                         newExcersize = new AddTrainingSessionStatsExercise()
                         {
@@ -531,7 +557,8 @@ namespace TrainerizeMigrate.DataManagers
                                 sets = 0,
                                 superSetID = excersize.superSetID,
                                 supersetType = excersize.superSetID > 0 ? "superset" : "none",
-                                target = excersize.target
+                                target = excersize.target,
+                                targetDetail = null
                             },
                             stats = new List<AddTrainingSessionStat>()
                         {
@@ -583,7 +610,7 @@ namespace TrainerizeMigrate.DataManagers
                             weight = stat.weight
                         });
                     }
-                }
+                //}
             }
 
             if (newExcersize != null)
@@ -598,6 +625,8 @@ namespace TrainerizeMigrate.DataManagers
         private bool PushTrainingSessionIntoTrainerize(AuthenticationSession authDetails, TrainingSessionWorkout workout)
         {
             AddTrainingSessionStatsRequest jsonBody = CreatePushTrainingStatsRequest(authDetails, workout);
+
+            string text = JsonConvert.SerializeObject(jsonBody);
 
             if (jsonBody == null || jsonBody.dailyWorkouts[0].exercises.Count == 0)
                 return false;
@@ -633,19 +662,26 @@ namespace TrainerizeMigrate.DataManagers
             return true;
         }
 
-        private WorkoutExcersize GetExcersizeFromWorkout(int? newWorkoutId, int? excersizeId)
+        private WorkoutExcersize? GetExcersizeFromWorkout(int? newWorkoutId, int? excersizeId)
         {
-            PlanWorkout plannedWorkout = _context.TrainingPlanWorkout.Include(x => x.excersizes.Where(x => x.id == excersizeId)).FirstOrDefault(x => x.new_id== newWorkoutId);
+            PlanWorkout plannedWorkout = _context.TrainingPlanWorkout.Include(x => x.excersizes).FirstOrDefault(x => x.new_id == newWorkoutId);
 
             if (plannedWorkout == null || plannedWorkout.excersizes == null || plannedWorkout.excersizes.Count == 0)
                 return null;
 
-            return plannedWorkout.excersizes[0];
+            return plannedWorkout.excersizes.FirstOrDefault(x => x.id == excersizeId);
+        }
+
+        private WorkoutExcersize? GetExcersizeFromAnyWorkout(int? excersizeId)
+        {
+            WorkoutExcersize excersize = _context.WorkoutExcersize.FirstOrDefault(x => x.id == excersizeId);
+
+            return excersize;
         }
 
         private List<TrainingSessionWorkout> ReadTrainingSessionStatsNotImported()
         {
-            return _context.TrainingSessionWorkout.Include(x => x.stats.Where(t => t.newdailyExerciseID == null)).Where(y => y.newdailyWorkoutId != null).ToList();
+            return _context.TrainingSessionWorkout.Include(x => x.stats).Where(y => y.newdailyWorkoutId != null).ToList();
         }
 
         static ProgressColumn[] GetProgressColumns()
