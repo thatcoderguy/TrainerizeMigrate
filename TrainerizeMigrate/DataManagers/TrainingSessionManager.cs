@@ -405,20 +405,23 @@ namespace TrainerizeMigrate.DataManagers
 
             return true;
         }
+         
 
-
-        private bool LinkNewWorkoutExcersizesToOldWorkoutExcersizes2(AuthenticationSession authDetails, TrainingSessionWorkout workout)
+        private bool LinkNewWorkoutExcersizesToOldWorkoutExcersizes(AuthenticationSession authDetails, TrainingSessionWorkout workout)
         {
 
+            //(actual excersizes/sets from old trainerize)
             //get workoutstats  -> [id] , ,[calories] ,[dailyExerciseID] ,[distance] ,[level] ,[newdailyExerciseID] ,[reps] ,[setNumber] ,[speed] ,[time] ,[weight] ,[excersizeId] ,[order]
+
+            //(planned excersizes form old trainerize)
             //get workoutexcersize  -> [SystemId] , ,[id] ,[intervalTime] ,[order] ,[restTime] ,[sets] ,[superSetID] ,[target] ,[targetDetailText] ,[targetDetailTime] ,[targetDetailType]
 
             //get stats from new trainerize workout - for new daily exceerisze ids
 
             //check if excersize id exists in workoutexcersize
-                //yes - update workoutstats - dailyexcersizeid
+            //yes - update workoutstats - dailyexcersizeid
 
-                //no - update workoutstats - generate new id
+            //no - update workoutstats - generate new id
 
 
 
@@ -427,10 +430,62 @@ namespace TrainerizeMigrate.DataManagers
             //if item is sub... then new id   --- ensure old item is removed
 
 
+            //pulled from new trainerize
+            TrainingSessionStatsResponse? createdWorkout = PullTrainingSessionStatsFromTrainerize(authDetails, workout.newdailyWorkoutId);
+
+            if (createdWorkout == null || createdWorkout.dailyWorkouts == null || createdWorkout.dailyWorkouts.Count == 0)
+                return false;
+
+            TrainingSessionWorkout? exportedWorkout = _context.TrainingSessionWorkout.Include(x => x.stats).FirstOrDefault(x => x.newdailyWorkoutId == workout.newdailyWorkoutId);
+
+            if (exportedWorkout == null)
+                return false;
+
+            //get daily exersize id update matching rows in workoutstats
+            foreach (TrainingSessionStatsExercise excersize in createdWorkout.dailyWorkouts[0].exercises)
+            {
+                List<TrainingSessionStat> statsToUpdate = exportedWorkout.stats.Where(x => x.excersizeId == excersize.def.id).ToList();
+
+                foreach(TrainingSessionStat stat in statsToUpdate)
+                {
+                    stat.newdailyExerciseID = excersize.dailyExerciseID;
+                    _context.TrainingSessionStat.Update(stat);
+                }
+            }
+
+            List<TrainingSessionStat> statsSubstitutedOrAdded = exportedWorkout.stats.Where(x => x.newdailyExerciseID == null).ToList();
+
+            int? excersizeId = 0;
+            DateTimeOffset dto = DateTimeOffset.Now;
+
+            //create a new daily excersize for all of new/subs
+            foreach (TrainingSessionStat stat in statsSubstitutedOrAdded)
+            {
+                if (excersizeId != stat.excersizeId || excersizeId == 0)
+                {
+
+                    dto = new DateTimeOffset(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Second, DateTime.Now.Nanosecond / 100, TimeSpan.Zero);
+
+                    stat.newdailyExerciseID = dto.ToUnixTimeMilliseconds();
+                    _context.TrainingSessionStat.Update(stat);
+                    _context.SaveChanges();
+
+                    excersizeId = stat.excersizeId;
+                }
+                else
+                {
+                    stat.newdailyExerciseID = dto.ToUnixTimeMilliseconds();
+                    _context.TrainingSessionStat.Update(stat);
+                    _context.SaveChanges();
+                }
+            }
+
+            _context.SaveChanges();
 
             return true;
         }
 
+        /*
         private bool LinkNewWorkoutExcersizesToOldWorkoutExcersizes(AuthenticationSession authDetails, TrainingSessionWorkout workout)
         {
             //pulled from new trainerize
@@ -492,6 +547,7 @@ namespace TrainerizeMigrate.DataManagers
 
             return true;
         }
+        */
 
         private AddTrainingSessionStatsRequest CreatePushTrainingStatsRequest(AuthenticationSession authDetails, TrainingSessionWorkout workout)
         {
