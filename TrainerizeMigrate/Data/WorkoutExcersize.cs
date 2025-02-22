@@ -17,6 +17,7 @@ namespace TrainerizeMigrate.Data
         public int? targetDetailType { get; set; }
         public double? targetDetailTime { get; set; }
         public string? targetDetailText { get; set; }
+        public string? recordType { get; set; }
         public int order {  get; set; }
     }
 }

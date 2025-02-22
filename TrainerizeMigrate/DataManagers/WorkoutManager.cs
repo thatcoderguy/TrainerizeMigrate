@@ -386,7 +386,8 @@ namespace TrainerizeMigrate.DataManagers
                             targetDetailType = exercise.targetDetail is null ? null : exercise.targetDetail.type,
                             SystemId = new Guid(),
                             intervalTime = exercise.intervalTime,
-                            order = order
+                            order = order,
+                            recordType = exercise.recordType
                         };
 
                         order++;

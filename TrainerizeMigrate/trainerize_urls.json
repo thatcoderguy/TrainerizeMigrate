@@ -18,5 +18,6 @@
   "gettrainingsessionworkoutlisturl": "https://api.trainerize.com/v03/progressReport/workout",
   "gettrainingsessionstatsurl": "https://api.trainerize.com/v03/dailyWorkout/get",
   "addtrainingsessionurl": "https://api.trainerize.com/v03/dailyWorkout/set",
-  "addtrainingsessionstatsurl": "https://api.trainerize.com/v03/dailyWorkout/set"
+  "addtrainingsessionstatsurl": "https://api.trainerize.com/v03/dailyWorkout/set",
+  "getexcersizedetailsurl": "https://api.trainerize.com/v03/exercise/get"
 }

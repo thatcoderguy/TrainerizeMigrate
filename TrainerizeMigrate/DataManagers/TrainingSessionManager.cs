@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
 using Spectre.Console;
+using System.Text.Json.Nodes;
 using TrainerizeMigrate.API;
 using TrainerizeMigrate.Data;
 using TrainerizeMigrate.Migrations;
@@ -583,69 +584,40 @@ namespace TrainerizeMigrate.DataManagers
 
             foreach (TrainingSessionStat stat in orderedStats)
             {
-                //if (stat.reps == null && stat.weight == null)
-                //{
 
-                //}
-                //else
-                //{
-                    if (excersizeId != stat.newdailyExerciseID)
+                if (excersizeId != stat.newdailyExerciseID)
+                {
+                    if (newExcersize != null)
                     {
-                        if (newExcersize != null)
-                        {
-                            newExcersize.def.sets = newExcersize.stats.Count;
-                            pushTrainingStatsRequest.dailyWorkouts[0].exercises.Add(newExcersize);
-                        }
-
-                        WorkoutExcersize excersize = GetExcersizeFromWorkout(workout.workoutId, stat.excersizeId);
-
-                        if (excersize == null)
-                            excersize = GetExcersizeFromAnyWorkout(stat.excersizeId);
-
-                        newExcersize = new AddTrainingSessionStatsExercise()
-                        {
-                            dailyExerciseID = stat.newdailyExerciseID,
-                            def = new AddTrainingSessionDef()
-                            {
-                                id = stat.excersizeId,
-                                intervalTime = excersize.intervalTime,
-                                restTime = excersize.restTime,
-                                sets = 0,
-                                superSetID = excersize.superSetID,
-                                supersetType = excersize.superSetID > 0 ? "superset" : "none",
-                                target = excersize.target,
-                                targetDetail = null
-                            },
-                            stats = new List<AddTrainingSessionStat>()
-                        {
-                            new AddTrainingSessionStat()
-                            {
-                                avgPace = null,
-                                avgSpeed = null,
-                                calories = null,
-                                distance = null,
-                                level = null,
-                                speed = null,
-                                time = null,
-                                id = 0,
-                                units = new Units()
-                                {
-                                    distance = "km",
-                                    weight = "kg",
-                                    bodystats = "cm"
-                                },
-                                reps = stat.reps,
-                                setID  = stat.setNumber,
-                                weight = stat.weight
-                            }
-                        }
-                        };
-
-                        excersizeId = stat.newdailyExerciseID;
+                        newExcersize.def.sets = newExcersize.stats.Count;
+                        pushTrainingStatsRequest.dailyWorkouts[0].exercises.Add(newExcersize);
                     }
-                    else
+
+                    WorkoutExcersize excersize = GetExcersizeFromWorkout(workout.workoutId, stat.excersizeId);
+
+                    if (excersize == null)
+                        excersize = GetExcersizeFromAnyWorkout(stat.excersizeId);
+
+                    if (excersize == null)
+                        excersize = GetExcersizeFromTrainerize(authDetails, stat.excersizeId);
+
+                    newExcersize = new AddTrainingSessionStatsExercise()
                     {
-                        newExcersize.stats.Add(new AddTrainingSessionStat()
+                        dailyExerciseID = stat.newdailyExerciseID,
+                        def = new AddTrainingSessionDef()
+                        {
+                            id = stat.excersizeId,
+                            intervalTime = excersize.intervalTime,
+                            restTime = excersize.restTime,
+                            sets = 0,
+                            superSetID = excersize.superSetID,
+                            supersetType = excersize.superSetID > 0 ? "superset" : "none",
+                            target = excersize.target,
+                            recordType = excersize.recordType
+                        },
+                        stats = new List<AddTrainingSessionStat>()
+                    {
+                        new AddTrainingSessionStat()
                         {
                             avgPace = null,
                             avgSpeed = null,
@@ -662,11 +634,38 @@ namespace TrainerizeMigrate.DataManagers
                                 bodystats = "cm"
                             },
                             reps = stat.reps,
-                            setID = stat.setNumber,
+                            setID  = stat.setNumber,
                             weight = stat.weight
-                        });
+                        }
                     }
-                //}
+                    };
+
+                    excersizeId = stat.newdailyExerciseID;
+                }
+                else
+                {
+                    newExcersize.stats.Add(new AddTrainingSessionStat()
+                    {
+                        avgPace = null,
+                        avgSpeed = null,
+                        calories = null,
+                        distance = null,
+                        level = null,
+                        speed = null,
+                        time = null,
+                        id = 0,
+                        units = new Units()
+                        {
+                            distance = "km",
+                            weight = "kg",
+                            bodystats = "cm"
+                        },
+                        reps = stat.reps,
+                        setID = stat.setNumber,
+                        weight = stat.weight
+                    });
+                }
+
             }
 
             if (newExcersize != null)
@@ -681,8 +680,6 @@ namespace TrainerizeMigrate.DataManagers
         private bool PushTrainingSessionIntoTrainerize(AuthenticationSession authDetails, TrainingSessionWorkout workout)
         {
             AddTrainingSessionStatsRequest jsonBody = CreatePushTrainingStatsRequest(authDetails, workout);
-
-            string text = JsonConvert.SerializeObject(jsonBody);
 
             if (jsonBody == null || jsonBody.dailyWorkouts[0].exercises.Count == 0)
                 return false;
@@ -733,6 +730,62 @@ namespace TrainerizeMigrate.DataManagers
             WorkoutExcersize excersize = _context.WorkoutExcersize.FirstOrDefault(x => x.id == excersizeId);
 
             return excersize;
+        }
+
+        private WorkoutExcersize? GetExcersizeFromTrainerize(AuthenticationSession authDetails, int? excersizeId)
+        {
+            ExcersizeDetailsRequest jsonBody = new ExcersizeDetailsRequest()
+            {
+                id = excersizeId
+            };
+
+            var authenticator = new JwtAuthenticator(authDetails.token);
+            var options = new RestClientOptions()
+            {
+                Authenticator = authenticator,
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            RestClient client = new RestClient(options);
+            var request = new RestRequest();
+            request.Resource = _config.GetExcersizeDetailsUrl();
+            request.Method = Method.Post;
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+            var queryResult = client.Execute(request);
+
+            ExcersizeDetailsResponse? response = null;
+
+            try
+            {
+                response = JsonConvert.DeserializeObject<ExcersizeDetailsResponse>(queryResult.Content);
+
+                if (response == null || response.id == null)
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup("[red]Error: " + ex.Message + "\n[/]");
+                return null;
+            }
+
+            return ConvertExcersizeDetailsRequestToWorkoutExcersize(response);
+        }
+
+        public WorkoutExcersize ConvertExcersizeDetailsRequestToWorkoutExcersize(ExcersizeDetailsResponse excersizeDetails)
+        {
+            return new WorkoutExcersize()
+            {
+                id = excersizeDetails.id,
+                recordType = excersizeDetails.recordType,
+                intervalTime = 180,
+                order = 999,
+                restTime = 180,
+                sets = 3,
+                superSetID = 0,
+                target = "",
+                targetDetailText = "",
+                targetDetailTime = 0,
+                targetDetailType = 0
+            };
         }
 
         private List<TrainingSessionWorkout> ReadTrainingSessionStatsNotImported()
