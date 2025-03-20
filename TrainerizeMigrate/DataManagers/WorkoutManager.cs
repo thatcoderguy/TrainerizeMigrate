@@ -151,20 +151,23 @@ namespace TrainerizeMigrate.DataManagers
         {
             foreach (Plan phase in programPhases.plans)
             {
-                _context.TrainingProgramPhase.Add(new ProgramPhase()
+                if (!_context.TrainingProgramPhase.Any(x => x.id == phase.id))
                 {
-                    id = phase.id,
-                    endDate = phase.endDate,
-                    instruction = phase.instruction,
-                    modified = phase.modified,
-                    name = phase.name,
-                    planType = phase.planType,
-                    startDate = phase.startDate,
-                    durationType = phase.durationType,
-                    duration = phase.duration
-                });
+                    _context.TrainingProgramPhase.Add(new ProgramPhase()
+                    {
+                        id = phase.id,
+                        endDate = phase.endDate,
+                        instruction = phase.instruction,
+                        modified = phase.modified,
+                        name = phase.name,
+                        planType = phase.planType,
+                        startDate = phase.startDate,
+                        durationType = phase.durationType,
+                        duration = phase.duration
+                    });
 
-                _context.SaveChanges();
+                    _context.SaveChanges();
+                }
             }
 
             return true;
